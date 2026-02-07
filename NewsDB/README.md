@@ -6,4 +6,4 @@
 
     docker exec -it newsdb bash -l
 
-   mysql -u root -proot newsdb 
+    mysql -u root -proot newsdb 
