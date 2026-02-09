@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 
 model_path = 'model/'
-model_name = os.getenv('MODEL_NAME')
+model_name = os.getenv('HF_MODEL')
 
 def download_model(model_path, model_name):
     """Download a Hugging Face model and tokenizer to the specified directory"""

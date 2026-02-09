@@ -1,7 +1,7 @@
 import os
 import requests
 
-API_URL = os.getenv('HF_API_URL')
+API_URL = os.getenv('HF_API')
 headers = { "Authorization": f"Bearer {os.getenv('HF_TOKEN')}" }
 
 def query(text, labels):
@@ -17,25 +17,25 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
-def classify():
+def classifier():
     """Label classification from a text."""
     data = request.get_json()
     labels = data.get('labels', [])
     text = data.get('text', '')
 
     if text and labels:
-        data, code = query(text, labels)
+        res, status_code = query(text, labels)
         
-        if code != 200:
-            return jsonify({'error': 'HF API'}), code
+        if status_code != 200:
+            return jsonify({'error': 'HF API'}), status_code
 
         # [ {'label': LABEL, 'score': SCORE} ]
-        sorted_labels = [item['label'] for item in sorted(data, key=lambda x: x['score'], reverse=True)]
+        sorted_labels = [item['label'] for item in sorted(res, key=lambda x: x['score'], reverse=True)]
         
-        return jsonify({f'result': sorted_labels})
+        return jsonify({f'result': sorted_labels}), 200, {'Content-Type': 'application/json; charset=utf-8'}
     else:
         return jsonify({'error': 'Text to compute not provided'}), 400
     
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8083, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=False)
 

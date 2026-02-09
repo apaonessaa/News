@@ -1,5 +1,7 @@
 FROM python:3.10-slim
 
+ARG HF_MODEL
+
 WORKDIR /app
 
 COPY requirements.txt .
@@ -9,12 +11,11 @@ COPY download_models.py .
 RUN python3 -m venv .venv
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Download the model
 RUN pip install -r requirements.txt
-ENV MODEL_NAME=gsarti/it5-base-news-summarization
+ENV HF_MODEL=${HF_MODEL}
 RUN python3 download_models.py
 
-EXPOSE 8082
+EXPOSE 8000
 
 ENTRYPOINT ["python3"]
 

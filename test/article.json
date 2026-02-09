@@ -1,9 +1,0 @@
-{
-  "title": "New Article Title",
-  "summary": "Summary of the article",
-  "content": "Content of the article",
-  "image": "cat.png",
-  "category": "world",
-  "subcategories": ["europe"]
-}
-

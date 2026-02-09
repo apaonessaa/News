@@ -19,7 +19,7 @@ gen_kwargs = {
     "num_return_sequences": 1,
     "repetition_penalty": 3.5,
     "encoder_repetition_penalty": 2.0,
-    "length_penalty": 1.5, 
+    "length_penalty": 1.0, 
     "encoder_no_repeat_ngram_size": 4,
     "no_repeat_ngram_size": 6,
 }
@@ -34,13 +34,18 @@ def generate():
     res = ''
 
     if from_text:
-        inputs = tokenizer(from_text, return_tensors="pt", max_length=16384, truncation=True, add_special_tokens=True)
-        outputs = model.generate(**inputs, **gen_kwargs)
-        out = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        try:
+            inputs = tokenizer(from_text, return_tensors="pt", max_length=16384, truncation=True, add_special_tokens=True)
+            outputs = model.generate(**inputs, **gen_kwargs)
+            out = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        except Exception as Ex:
+            return jsonify({'error': 'Summarizer'}), 500
+
         res = out.decode( 'unicode-escape' ).encode( 'ascii' )
-        return jsonify({f'result': res})
+
+        return jsonify({f'result': res}), 200, {'Content-Type': 'application/json; charset=utf-8'}
     else:
         return jsonify({'error': 'Text to compute not provided'}), 400
     
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8082, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True)
