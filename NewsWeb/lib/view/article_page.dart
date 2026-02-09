@@ -76,23 +76,13 @@ class _ArticlePageState extends State<ArticlePage>
     return [
       Text(
         art!.category,
-        style: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.5,
-          height: 1.5,
-        ),
+        style: Theme.of(context).textTheme.displaySmall,
         textAlign: TextAlign.start,
       ),
       const SizedBox(height: 10),
       Text(
         art!.title,
-        style: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.5,
-          height: 1.5,
-        ),
+        style: Theme.of(context).textTheme.titleLarge,
         textAlign: TextAlign.start,
       ),
       const SizedBox(height: 10),
@@ -105,12 +95,7 @@ class _ArticlePageState extends State<ArticlePage>
       const SizedBox(height: 10),
       Text(
         art!.summary,
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.normal,
-          letterSpacing: 0.5,
-          height: 1.5,
-        ),
+        style: Theme.of(context).textTheme.bodyLarge,
         textAlign: TextAlign.start,
       ),
       const SizedBox(height: 10),
@@ -118,12 +103,7 @@ class _ArticlePageState extends State<ArticlePage>
       const SizedBox(height: 10),
       Text(
         art!.content,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
-          letterSpacing: 0.5,
-          height: 1.5,
-        ),
+        style: Theme.of(context).textTheme.bodyMedium,
         textAlign: TextAlign.start,
       ),
     ];

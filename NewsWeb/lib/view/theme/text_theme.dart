@@ -13,6 +13,15 @@ TextTheme createTextTheme(BuildContext context, String bodyFontString, String di
     labelLarge: bodyTextTheme.labelLarge,
     labelMedium: bodyTextTheme.labelMedium,
     labelSmall: bodyTextTheme.labelSmall,
+    headlineLarge: bodyTextTheme.headlineLarge,
+    headlineMedium: bodyTextTheme.headlineMedium,
+    headlineSmall: bodyTextTheme.headlineSmall,
+    displayLarge: bodyTextTheme.displayLarge,
+    displayMedium: bodyTextTheme.displayMedium,
+    displaySmall: bodyTextTheme.displaySmall,
+    titleLarge: bodyTextTheme.titleLarge,
+    titleMedium: bodyTextTheme.titleMedium,
+    titleSmall: bodyTextTheme.titleSmall,
   );
   return textTheme;
 }
