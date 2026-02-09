@@ -1,4 +1,5 @@
-class Subcategory {
+class Subcategory 
+{
     String name;
     String description;
     String category;
@@ -7,9 +8,10 @@ class Subcategory {
         required this.name,
         required this.description,
         required this.category
-    })
+    });
 
-    factory Subcategory.fromJson(Map<String, dynamic> json) {
+    factory Subcategory.fromJson(Map<String, dynamic> json) 
+    {
         return Subcategory(
             name: json['name'] ?? '',
             description: json['description'] ?? '',
@@ -17,11 +19,9 @@ class Subcategory {
         );
     }
 
-    // JSON serialization for Article
     Map<String, dynamic> toJson() => {
         'name': name,
         'description': description,
         'category': category
-    }
-
+    };
 }

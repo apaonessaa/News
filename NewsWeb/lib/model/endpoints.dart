@@ -1,4 +1,5 @@
-class Endpoints {
+class Endpoints 
+{
     static const String REMOTE_API = "http://localhost:8081/api/";
     static const String ARTICLE = "articles";
 
@@ -15,5 +16,4 @@ class Endpoints {
     static String subcategory(String category) {
         return "${CATEGORY}/${category}/subcategories";
     }
-
 }

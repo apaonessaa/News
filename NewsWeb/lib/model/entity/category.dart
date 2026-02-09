@@ -1,15 +1,17 @@
-class Category {
+class Category 
+{
     String name;
     String description;
-    List<String> subcategory;
+    List<String> subcategory=[];
 
     Category({
         required this.name,
         required this.description,
-        required this.subcategories
-    })
+        required this.subcategory
+    });
 
-    factory Category.fromJson(Map<String, dynamic> json) {
+    factory Category.fromJson(Map<String, dynamic> json) 
+    {
         return Category(
             name: json['name'] ?? '',
             description: json['description'] ?? '',
@@ -21,5 +23,5 @@ class Category {
         'name': name,
         'description': description,
         'subcategories': subcategory
-    }
+    };
 }

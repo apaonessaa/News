@@ -5,20 +5,23 @@ import 'package:newsweb/view/theme/text_theme.dart';
 import 'package:newsweb/view/layout/util.dart';
 import 'package:newsweb/view/article_page.dart';
 
-void main() {
+void main() 
+{
   runApp(App());
 }
 
-class App extends StatefulWidget {
+class App extends StatefulWidget 
+{
   const App({super.key});
   @override
   State<App> createState() => _App();
 }
 
-class _App extends State<App> {
+class _App extends State<App> 
+{
   @override
   Widget build(BuildContext context) {
-    // Theme
+    // Themes
     TextTheme textTheme = createTextTheme(context, "Atkinson Hyperlegible", "Atkinson Hyperlegible");
     MaterialTheme theme = MaterialTheme(textTheme);
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:newsweb/view/theme/theme.dart';
+import 'package:newsweb/view/layout/footer_page.dart';
 
 class CustomPage extends StatefulWidget {
   final List<Widget> actions;
@@ -36,7 +37,8 @@ class _CustomPage extends State<CustomPage> {
               )
             );
           }
-        )
+        ),
+      drawer: FooterPage(),
     );
   }
 }

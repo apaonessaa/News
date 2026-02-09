@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 enum HttpMethod { POST, GET, PUT, DELETE }
 enum TypeHeader { JSON, URL_ENCODED, IMAGE }
 
-class Service {
+class Service 
+{
   static Future<dynamic> request(
       HttpMethod method,
       String serverAddress,

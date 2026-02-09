@@ -1,4 +1,5 @@
-class Article {
+class Article 
+{
     String title;
     String summary;
     String content;
@@ -15,7 +16,8 @@ class Article {
         required this.image
     });
 
-    factory Article.fromJson(Map<String, dynamic> json) {
+    factory Article.fromJson(Map<String, dynamic> json) 
+    {
         return Article(
             title: json['title'] ?? '',
             summary: json['summary'] ?? '',
