@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+import 'package:newsweb/view/theme/theme.dart';
+
+class CustomPage extends StatefulWidget {
+  final List<Widget> actions;
+  final List<Widget> content;
+  const CustomPage({super.key, required this.actions, required this.content});
+  @override
+  State<CustomPage> createState() => _CustomPage();
+}
+
+class _CustomPage extends State<CustomPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        actions: widget.actions
+      ),
+      body:
+        LayoutBuilder(
+          builder: (context, constraints) {
+            double horizontalPadding = constraints.maxWidth > 600 ? 65.0 : 20.0;
+            return SingleChildScrollView(
+              child: SizedBox(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 25.0,
+                    horizontal: horizontalPadding,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: widget.content,
+                  )
+                )
+              )
+            );
+          }
+        )
+    );
+  }
+}
