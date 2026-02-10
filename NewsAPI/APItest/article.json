@@ -1,0 +1,9 @@
+{
+  "title": "Some Article Title 2",
+  "summary": "Summary of the article",
+  "content": "Content of the article",
+  "image": "cat.jpeg",
+  "category": "world",
+  "subcategories": ["europe"]
+}
+

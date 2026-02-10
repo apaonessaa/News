@@ -1,0 +1,23 @@
+##### Logging Configuration ####
+logging:
+  level:
+    org.springframework.security: DEBUG
+debug: true
+
+#### SERVER ####
+server:
+  port: 8081
+
+#### Spring config #####
+spring:
+  profiles:
+    active: dev
+  application:
+    name: NewsAPI
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect

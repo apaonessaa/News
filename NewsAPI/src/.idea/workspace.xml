@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="273a774e-77c6-45db-846a-fb40c0111892" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/NewsApiApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/java/com/app/news/NewsApiApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/configurations/SecurityConfiguration.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/configurations/keycloak/JWToken.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/configurations/keycloak/KeycloakConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/configurations/keycloak/KeycloakJwtRolesConverter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/controllers/ArticleController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/controllers/CategoryController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/controllers/HomeController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/controllers/TagController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/controllers/UserController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/entities/Admin.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/entities/Article.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/java/com/app/news/entities/Article.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/entities/Author.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/java/com/app/news/entities/Administrator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/entities/Category.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/java/com/app/news/entities/Category.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/entities/Tag.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/java/com/app/news/entities/SubCategory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/entities/User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/repositories/ArticleRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/repositories/AuthorRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/repositories/CategoryRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/repositories/TagRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/repositories/UserRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/services/ArticleService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/services/CategoryService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/services/SecurityService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/services/TagService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/services/UserService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/services/keycloak/KeycloakService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/supports/dto/AdvancedSearch.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/supports/dto/ErrorResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/supports/dto/Like.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/supports/dto/SignUpRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/supports/dto/UserInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/supports/exceptions/AlreadyExistsException.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/java/com/app/news/supports/exceptions/AlreadyExistsException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/supports/exceptions/ConflictOccurException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/supports/exceptions/NotAuthorizedOperationException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/supports/exceptions/NotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/java/com/app/news/supports/exceptions/NotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/supports/security/CustomAccessDenied.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/java/com/app/news/supports/security/CustomAccessDenied.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/java/com/app/news/supports/security/CustomAuthenticationEntryPoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/main/java/com/app/news/supports/security/CustomAuthenticationEntryPoint.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 3
+}]]></component>
+  <component name="ProjectId" id="39FZt1v4aFzy0CjIGObPMZjxNXN" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="273a774e-77c6-45db-846a-fb40c0111892" name="Changes" comment="" />
+      <created>1770293996298</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1770293996298</updated>
+    </task>
+    <servers />
+  </component>
+</project>
