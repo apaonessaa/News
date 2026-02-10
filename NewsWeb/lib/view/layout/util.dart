@@ -52,4 +52,51 @@ class Util
           ),
         );
     }
+
+    static List<T> getAndRemove<T>(List<T> list, int count) {
+      final int end = list.length < count ? list.length : count;
+      final List<T> sublist = list.sublist(0, end);
+      list.removeRange(0, end);
+      return sublist;
+    }
+  
+    static List<T> pagedList<T>(List<T> list, int pageNumber, int pageSize) {
+      if(list.isEmpty) {
+        return [];
+      }
+
+      int start = pageNumber*pageSize;
+      int end = start + pageSize;
+
+      if(list.length<start) {
+        start = list.length;
+      }
+
+      if(list.length<end) {
+        end = list.length;
+      }
+      return list.sublist(start,end);
+    }
+}
+
+///////////////////////// LAYOUT /////////////////////////////////
+final class UtilsLayout {
+  // Boxed Content
+  static Widget layout(List<Widget> content, double maxWidth) {
+    return SizedBox(
+      width: double.infinity,
+      child: Row(
+        children: [
+          const Expanded(child: SizedBox()), // Left spacer
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            child: Column(
+              children: content,
+            ),
+          ),
+          const Expanded(child: SizedBox()), // Right spacer
+        ],
+      ),
+    );
+  }
 }

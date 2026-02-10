@@ -12,7 +12,9 @@ class CustomPage extends StatefulWidget {
   State<CustomPage> createState() => _CustomPage();
 }
 
-class _CustomPage extends State<CustomPage> {
+class _CustomPage extends State<CustomPage> 
+{
+  ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:newsweb/model/entity/article.dart';
+import 'package:newsweb/model/entity/paging.dart';
 import 'package:newsweb/model/entity/category.dart';
 import 'package:newsweb/model/service.dart';
 import 'package:newsweb/model/endpoints.dart';
@@ -7,6 +8,31 @@ import 'package:newsweb/model/endpoints.dart';
 class RetriveData 
 {
     static RetriveData sharedInstance = RetriveData();
+
+    Future<PaginatedArticles?> getMainArticles(int pageNumber, int pageSize) async 
+    {
+        try {
+            dynamic response = await Service.request(
+            HttpMethod.GET,
+            Endpoints.REMOTE_API,
+            Endpoints.ARTICLE,
+            params: {
+                'pageNumber': '$pageNumber',
+                'pageSize': '$pageSize',
+            },
+            );
+
+            if (response != null && response is Map<String, dynamic>) {
+            print("API response: $response"); 
+            return PaginatedArticles.fromJson(response);
+            }
+            return null;
+        } catch (error) {
+            print("Error fetching articles: $error");
+            throw Exception('Error fetching articles');
+        }
+    }
+
 
     Future<Article> getArticle(String title) async 
     {

@@ -61,6 +61,7 @@ class _CategoryDrawer extends State<CategoryDrawer> {
         List<Category> categories = snapshot.data!;
 
         return Drawer(
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           child: Container(
             color: Colors.black,
             child: ListView(

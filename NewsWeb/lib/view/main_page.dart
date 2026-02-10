@@ -1,0 +1,198 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:newsweb/model/retrive_data.dart';
+import 'package:newsweb/model/entity/article.dart';
+import 'package:newsweb/view/layout/custom_page.dart';
+import 'package:newsweb/view/layout/article_page/layer.dart';
+import 'package:newsweb/view/layout/article_page/list_article.dart';
+import 'package:newsweb/view/layout/article_page/one_article.dart';
+import 'package:newsweb/view/layout/article_page/stack_article.dart';
+import 'package:newsweb/view/layout/util.dart';
+
+class MainPage extends StatefulWidget 
+{ 
+    const MainPage({super.key}); 
+    @override _MainPage createState() => _MainPage(); 
+}
+
+class _MainPage extends State<MainPage> 
+{
+  late List<Article> articles;
+  bool isLoading = true;
+  bool hasError = false;
+
+  List<Article> page = [];
+  int pageNumber = 0;
+  int pageSize = 17;
+  int maxPageNumber = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    articles = [];
+    _loadArticles();
+  }
+
+  // Funzione per caricare gli articoli
+  Future<void> _loadArticles() async {
+    try {
+      final result = await RetriveData.sharedInstance.getMainArticles(pageNumber, pageSize);
+      setState(() {
+        if (result != null) {
+          articles = result.content; // Imposta gli articoli dalla risposta
+          page = List.from(articles); // Popola la pagina
+          maxPageNumber = result.totalPages; // Imposta il numero massimo di pagine
+        }
+        isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+        hasError = true;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    articles.clear();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return CustomPage(
+        actions: [
+          Util.btn(
+            Icons.webhook,
+            'Home',
+            () => context.go('/'),
+          ),
+        ],
+        content: [Util.isLoading()],
+      );
+    }
+
+    if (hasError) {
+      return CustomPage(
+        actions: [
+          Util.btn(
+            Icons.webhook,
+            'Home',
+            () => context.go('/'),
+          ),
+        ],
+        content: [Util.error("Errore nel caricamento dell'articolo.")],
+      );
+    }
+
+    double maxWidth = MediaQuery.of(context).size.width * 0.75;
+    return CustomPage(
+      actions: [
+        Util.btn(
+          Icons.webhook,
+          'Home',
+          () => context.go('/'),
+        ),
+      ],
+      content: [
+        UtilsLayout.layout(_build(context), maxWidth),
+        const SizedBox(height: 100),
+      ],
+    );
+  }
+
+  List<Widget> _build(BuildContext context) {
+    // Verifica se ci sono articoli da visualizzare
+    if (page.isEmpty) {
+      return [const Text("Nessun articolo disponibile.")];
+    }
+
+    // Controlla che la pagina non sia vuota
+    return [
+      const SizedBox(height: 40.0),
+
+      // LAYER #1: Primo articolo in cima
+      if (page.isNotEmpty)
+        Layer(
+          widgets: [
+            OneArticle(
+              article: page.removeAt(0),
+              imageCover: 0.65,
+              height: 502,
+              withSummary: true,
+            ),
+            if (page.isNotEmpty)
+              StackOfArticles(
+                articles: Util.getAndRemove<Article>(page, 3),
+                withImage: true,
+                imageCover: 0.50,
+                height: 502,
+              ),
+          ],
+        ),
+
+      // LAYER #2: Altri articoli con layout alternato
+      if (page.isNotEmpty) ...[
+        const SizedBox(height: 50.0),
+        Layer(widgets: [
+          StackOfArticles(
+            articles: Util.getAndRemove<Article>(page, 3),
+            withImage: false,
+            height: 502,
+            imageCover: 0.5,
+          ),
+          if (page.isNotEmpty)
+            Column(
+              children: [
+                if (page.isNotEmpty)
+                  OneArticle(
+                    article: page.removeAt(0),
+                    height: 250,
+                    imageCover: 0.65,
+                  ),
+                if (page.isNotEmpty)
+                  OneArticle(
+                    article: page.removeAt(0),
+                    height: 250,
+                    imageCover: 0.65,
+                  ),
+              ],
+            ),
+        ])
+      ],
+
+      // LAYER #3: Altri articoli nella parte inferiore
+      if (page.isNotEmpty) ...[
+        const SizedBox(height: 50.0),
+        Layer(
+          widgets: [
+            Column(
+              children: [
+                if (page.length > 1)
+                  OneArticle(
+                    article: page.removeAt(0),
+                    height: 251,
+                    imageCover: 0.65,
+                  ),
+                if (page.length > 1)
+                  OneArticle(
+                    article: page.removeAt(0),
+                    height: 251,
+                    imageCover: 0.65,
+                  ),
+              ],
+            ),
+            if (page.isNotEmpty)
+              ListOfArticles(
+                articles: Util.getAndRemove<Article>(page, 6),
+                withImage: true,
+                height: 502,
+              ),
+          ],
+        ),
+      ],
+    ];
+  }
+}
