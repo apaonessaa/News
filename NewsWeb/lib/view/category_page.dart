@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:newsweb/model/retrive_data.dart';
 import 'package:newsweb/model/entity/article.dart';
+import 'package:newsweb/model/entity/category.dart';
 import 'package:newsweb/view/layout/custom_page.dart';
 import 'package:newsweb/view/layout/article_page/layer.dart';
 import 'package:newsweb/view/layout/article_page/list_article.dart';
@@ -10,33 +11,59 @@ import 'package:newsweb/view/layout/article_page/stack_article.dart';
 import 'package:newsweb/view/layout/cat_subcat_footer.dart';
 import 'package:newsweb/view/layout/util.dart';
 
-class CategoryPage extends StatefulWidget {
+class CategoryPage extends StatefulWidget 
+{
   final String categoryName;
 
   const CategoryPage({super.key, required this.categoryName});
 
   @override
-  _CategoryPageState createState() => _CategoryPageState();
+  _CategoryPage createState() => _CategoryPage();
 }
 
-class _CategoryPageState extends State<CategoryPage> {
+class _CategoryPage extends State<CategoryPage> 
+{
+  late Category category;
+  bool isLoadingCategory = true;
+  bool hasErrorCategory = false;
+
   late List<Article> articles;
   bool isLoading = true;
   bool hasError = false;
 
   List<Article> page = [];
   int pageNumber = 0;
-  int pageSize = 17;
+  int pageSize = 13;
   int maxPageNumber = 0;
 
   @override
   void initState() {
     super.initState();
     articles = [];
+    _loadCategory();
     _loadArticles();
   }
 
-  Future<void> _loadArticles() async {
+  Future<void> _loadCategory() async 
+  {
+    try {
+      final result = await RetriveData.sharedInstance.getCategory(widget.categoryName);
+      setState(() {
+        if (result != null) {
+          category = result;
+        }
+        isLoadingCategory = false;
+      });
+    } catch (error) {
+      setState(() {
+        isLoadingCategory = false;
+        hasErrorCategory = true;
+      });
+    }
+  }
+
+  Future<void> _loadArticles() async 
+  {
     try {
       final result = await RetriveData.sharedInstance.getArticleByCategory(
           widget.categoryName, pageNumber, pageSize);
@@ -85,7 +112,7 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
     double maxWidth = UtilsLayout.setWidth(context);
-    if (isLoading) {
+    if (isLoadingCategory) {
       return CustomPage(
         actions: [
           Util.btn(
@@ -98,7 +125,7 @@ class _CategoryPageState extends State<CategoryPage> {
       );
     }
 
-    if (hasError) {
+    if (hasErrorCategory) {
       return CustomPage(
         actions: [
           Util.btn(
@@ -109,7 +136,7 @@ class _CategoryPageState extends State<CategoryPage> {
         ],
         content: [
           UtilsLayout.layout(
-            [Util.error("Errore nel caricamento dell'articolo.")],
+            [Util.error("Errore nel caricamento della categoria.")],
             maxWidth,
           ),
           const SizedBox(height: 100),
@@ -136,7 +163,16 @@ class _CategoryPageState extends State<CategoryPage> {
     );
   }
 
-  List<Widget> _build(BuildContext context) {
+  List<Widget> _build(BuildContext context) 
+  {
+    if (isLoading) {
+      return [ Util.isLoading() ];
+    }
+
+    if (hasError) {
+      return [ Util.error("Errore nel caricamento dell'articolo.") ];
+    }
+
     if (page.isEmpty) {
       return [const Text("Nessun articolo disponibile.")];
     }
@@ -145,9 +181,17 @@ class _CategoryPageState extends State<CategoryPage> {
         const SizedBox(height: 40.0),
 
         Text(
-            widget.categoryName,
-            style: Theme.of(context).textTheme.displayMedium,
-            textAlign: TextAlign.start,
+          widget.categoryName,
+          style: Theme.of(context).textTheme.displayMedium,
+          textAlign: TextAlign.start,
+        ),
+
+        const SizedBox(height: 20.0),
+
+        Text(
+          category.description,
+          style: Theme.of(context).textTheme.bodyLarge,
+          textAlign: TextAlign.start,
         ),
 
         const SizedBox(height: 40.0),
@@ -183,58 +227,16 @@ class _CategoryPageState extends State<CategoryPage> {
             imageCover: 0.5,
           ),
           if (page.isNotEmpty)
-            Column(
-              children: [
-                if (page.isNotEmpty)
-                  OneArticle(
-                    article: page.removeAt(0),
-                    height: 250,
-                    imageCover: 0.65,
-                  ),
-                if (page.isNotEmpty)
-                  OneArticle(
-                    article: page.removeAt(0),
-                    height: 250,
-                    imageCover: 0.65,
-                  ),
-              ],
+            ListOfArticles(
+              articles: Util.getAndRemove<Article>(page, 6),
+              withImage: true,
+              height: 502,
             ),
         ])
       ],
-
-      // LAYER #3: Altri articoli nella parte inferiore
-      if (page.isNotEmpty) ...[
-        const SizedBox(height: 50.0),
-        Layer(
-          widgets: [
-            Column(
-              children: [
-                if (page.length > 1)
-                  OneArticle(
-                    article: page.removeAt(0),
-                    height: 251,
-                    imageCover: 0.65,
-                  ),
-                if (page.length > 1)
-                  OneArticle(
-                    article: page.removeAt(0),
-                    height: 251,
-                    imageCover: 0.65,
-                  ),
-              ],
-            ),
-            if (page.isNotEmpty)
-              ListOfArticles(
-                articles: Util.getAndRemove<Article>(page, 6),
-                withImage: true,
-                height: 502,
-              ),
-          ],
-        ),
-      ],
         
         // Paginazione
-        // Paginazione con pulsanti e testo all'estremo destro
+        const SizedBox(height: 20.0),
         const Spacer(flex: 1),
         Row(
             mainAxisAlignment: MainAxisAlignment.end,

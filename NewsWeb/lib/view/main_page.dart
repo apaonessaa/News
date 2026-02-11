@@ -128,7 +128,7 @@ class _MainPage extends State<MainPage>
           widgets: [
             OneArticle(
               article: page.removeAt(0),
-              imageCover: 0.65,
+              imageCover: 0.56,
               height: 502,
               withSummary: true,
             ),

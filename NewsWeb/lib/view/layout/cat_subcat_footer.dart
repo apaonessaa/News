@@ -91,7 +91,7 @@ class ListOfCategoryAndSubcategory extends StatelessWidget
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextButton(
-            onPressed: () => context.go('/cat/${category.name}'),
+            onPressed: () => context.go('/category/${category.name}'),
             child: Text(
               category.name,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -110,7 +110,7 @@ class ListOfCategoryAndSubcategory extends StatelessWidget
                   runSpacing: 4.0,
                   children: category.subcategory.map((subcat) {
                     return TextButton(
-                      onPressed: () => context.go('/'),
+                      onPressed: () => context.go('/category/${category.name}/subcategory/${subcat}'),
                       child: Text(
                         subcat,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(

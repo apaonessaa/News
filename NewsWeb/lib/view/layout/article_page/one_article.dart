@@ -25,7 +25,7 @@ class OneArticle extends StatelessWidget {
     this.article, 
     this.width = double.maxFinite, 
     this.height = 300, 
-    this.imageCover = 0.65,
+    this.imageCover = 0.60,
     this.withSummary = false, 
     super.key
   });
@@ -45,13 +45,13 @@ class OneArticle extends StatelessWidget {
           borderRadius: BorderRadius.zero,
         ),
         child: ListTile(
-          onTap: () => context.go('/art/${article!.title}'),
+          onTap: () => context.go('/article/${article!.title}'),
           title: Padding(
             padding: const EdgeInsets.only(
               left: 0.5, 
               right: 0.5, 
               top: 0.5, 
-              bottom: 10.0
+              bottom: 0.5
             ),
             child: ImageViewer(title: article!.title)
           ),
@@ -68,7 +68,7 @@ class OneArticle extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: 5.0),
               if (withSummary) ...[
                 Text(
                   article!.summary,

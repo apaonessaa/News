@@ -1,0 +1,26 @@
+services:
+  news-api:
+    build: .
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://news-db:3306/newsdb
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    ports:
+      - "8081:8081"
+    depends_on:
+      news-db:
+        condition: service_healthy
+
+  news-db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: newsdb
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s

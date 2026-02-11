@@ -2,12 +2,42 @@ import 'dart:typed_data';
 import 'package:newsweb/model/entity/article.dart';
 import 'package:newsweb/model/entity/paging.dart';
 import 'package:newsweb/model/entity/category.dart';
+import 'package:newsweb/model/entity/subcategory.dart';
 import 'package:newsweb/model/service.dart';
 import 'package:newsweb/model/endpoints.dart';
 
 class RetriveData 
 {
     static RetriveData sharedInstance = RetriveData();
+
+    Future<Subcategory> getSubcategory(String category, String subcategory) async 
+    {
+        try {
+            dynamic response = await Service.request(
+                HttpMethod.GET,
+                Endpoints.REMOTE_API,
+                Endpoints.subcategory(category, subcategory)
+            );
+            return Subcategory.fromJson(response);
+        } catch (error) {
+            throw Exception();
+        }
+    }
+
+    Future<Category> getCategory(String category) async 
+    {
+        try {
+            dynamic response = await Service.request(
+                HttpMethod.GET,
+                Endpoints.REMOTE_API,
+                Endpoints.category(category)
+            );
+            return Category.fromJson(response);
+        } catch (error) {
+            throw Exception();
+        }
+    }
+
 
     Future<PaginatedArticles?> getArticleByCategory(String cat, int pageNumber, int pageSize) async 
     {
@@ -32,6 +62,32 @@ class RetriveData
             throw Exception('Error fetching articles');
         }
     }
+
+    Future<PaginatedArticles?> getArticleBySubcategory(String cat, String subcat, int pageNumber, int pageSize) async 
+    {
+        try {
+            dynamic response = await Service.request(
+            HttpMethod.GET,
+            Endpoints.REMOTE_API,
+            Endpoints.subcategory_articles(cat,subcat),
+            params: {
+                'pageNumber': '$pageNumber',
+                'pageSize': '$pageSize',
+            },
+            );
+
+            if (response != null && response is Map<String, dynamic>) {
+            print("API response: $response"); 
+            return PaginatedArticles.fromJson(response);
+            }
+            return null;
+        } catch (error) {
+            print("Error fetching articles: $error");
+            throw Exception('Error fetching articles');
+        }
+    }
+
+    
 
     Future<PaginatedArticles?> getMainArticles(int pageNumber, int pageSize) async 
     {

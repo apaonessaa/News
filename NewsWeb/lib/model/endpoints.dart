@@ -13,11 +13,19 @@ class Endpoints
 
     static const String CATEGORY = "categories";
 
-    static String subcategory(String category) {
-        return "${CATEGORY}/${category}/subcategories";
+    static String category(String category) {
+        return "${CATEGORY}/${category}";
+    } 
+
+    static String subcategory(String category, String subcategory) {
+        return "${CATEGORY}/${category}/subcategories/${subcategory}";
     }   
 
     static String category_articles(String category) {
         return "${CATEGORY}/${category}/articles";
+    }
+
+    static String subcategory_articles(String category, String subcategory) {
+        return "${CATEGORY}/${category}/subcategories/${subcategory}/articles";
     }
 }

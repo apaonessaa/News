@@ -115,7 +115,7 @@ class _ArticlePage extends State<ArticlePage>
 
                     // Category
                     GestureDetector(
-                        onTap: () => context.go('/cat/${art!.category}'),
+                        onTap: () => context.go('/category/${art!.category}'),
                         child: Text(
                             art!.category,
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -153,7 +153,7 @@ class _ArticlePage extends State<ArticlePage>
                                         style: TextButton.styleFrom(
                                             backgroundColor: Colors.red,
                                         ),
-                                        onPressed: () => context.go('/cat/${art!.category}/subcat/${subcat}'),
+                                        onPressed: () => context.go('/category/${art!.category}/subcategory/${subcat}'),
                                         child: Text(
                                             subcat,
                                             style: Theme.of(context).textTheme.titleLarge?.copyWith(

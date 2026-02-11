@@ -6,6 +6,7 @@ import 'package:newsweb/view/layout/util.dart';
 import 'package:newsweb/view/main_page.dart';
 import 'package:newsweb/view/article_page.dart';
 import 'package:newsweb/view/category_page.dart';
+import 'package:newsweb/view/subcategory_page.dart';
 
 void main() 
 {
@@ -36,27 +37,25 @@ class _App extends State<App>
           },
           routes: <RouteBase>[
             GoRoute(
-              path: '/art/:title',
+              path: '/article/:title',
               builder: (BuildContext context, GoRouterState state) {
                 final title = state.pathParameters['title']!; 
                 return ArticlePage(title: title);
               },
             ),
             GoRoute(
-              path: '/cat/:name',
+              path: '/category/:name',
               builder: (BuildContext context, GoRouterState state) {
                 final name = state.pathParameters['name']!; 
-                //return CategoryPage(catname: catname ?? 'Unknown Category');
                 return CategoryPage(categoryName: name);
               },
             ),
             GoRoute(
-              path: '/cat/:cname/subcat/:scname',
+              path: '/category/:cname/subcategory/:scname',
               builder: (BuildContext context, GoRouterState state) {
                 final category = state.pathParameters['cname']!; 
                 final subcategory = state.pathParameters['scname']!; 
-                //return SubcategoryPage(subcatname: subcatname ?? 'Unknown Subcategory');
-                return MainPage();
+                return SubcategoryPage(categoryName: category, subcategoryName: subcategory);
               },
             ),
             GoRoute(
