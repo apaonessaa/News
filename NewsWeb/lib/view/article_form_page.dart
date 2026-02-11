@@ -1,0 +1,337 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:newsweb/model/retrive_data.dart';
+import 'package:newsweb/model/entity/article.dart';
+import 'package:newsweb/model/entity/category.dart';
+import 'package:newsweb/view/layout/custom_page.dart';
+import 'package:newsweb/view/layout/util.dart';
+import 'package:newsweb/view/layout/article_page/layer.dart';
+import 'dart:convert';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+
+class ArticleFormPage extends StatefulWidget {
+  final String? title;
+  const ArticleFormPage({super.key, this.title});
+  
+  @override 
+  _ArticleFormPage createState() => _ArticleFormPage();
+}
+
+class _ArticleFormPage extends State<ArticleFormPage> {
+  Article? article;
+  bool isLoading = true;
+  bool hasError = false;
+
+  List<Category> categories = [];
+  bool isLoadingCategory = true;
+  bool hasErrorCategory = false;
+
+  late quill.QuillController _titleController;
+  late quill.QuillController _abstractController;
+  late quill.QuillController _bodyController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = quill.QuillController.basic();
+    _abstractController = quill.QuillController.basic(); 
+    _bodyController = quill.QuillController.basic(); 
+    _loadCategories();
+    _loadArticle();
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _abstractController.dispose();
+    _bodyController.dispose();
+    super.dispose();
+  }
+
+  void _loadArticle() async {
+    if (widget.title != null) {
+      try {
+        final result = await RetriveData.sharedInstance.getArticle(widget.title!);
+        if (mounted) {
+          setState(() {
+            if (result != null) {
+              article = result;
+              _titleController = FormUtils._initController(article?.title);
+              _abstractController = FormUtils._initController(article?.summary);
+              _bodyController = FormUtils._initController(article?.content);
+            }
+            isLoading = false;
+          });
+        }
+      } catch (error) {
+        if (mounted) {
+          setState(() {
+            hasError = true;
+            isLoading = false;
+          });
+        }
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _loadCategories() async {
+    try {
+      final result = await RetriveData.sharedInstance.getCategories();
+      if (mounted && result != null) {
+        setState(() {
+          categories = result;
+          isLoadingCategory = false;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          hasErrorCategory = true;
+          isLoadingCategory = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPage(
+      actions: [
+        Util.btn(
+          Icons.home,
+          'Home',
+          () => context.go('/'),
+        ),
+      ],
+      content: [
+        const SizedBox(height: 40.0),
+        if (isLoading)
+          Util.isLoading()
+        else if (hasError)
+          Util.error("Errore nel caricamento dell'articolo.")
+        else
+          ...[
+                ..._titleForm(),
+                const SizedBox(height: 30),
+                ..._abstractForm(),
+                const SizedBox(height: 30),
+                ..._bodyForm(),
+                const SizedBox(height: 30),
+                // TODO image
+                // TODO category and subcategory
+            ],
+        const SizedBox(height: 100),
+      ],
+    );
+  }
+
+    List<Widget> _titleForm() {
+        return [
+            const Text(
+                'Titolo',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8.0),
+            Container(
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                ),
+                child: quill.QuillSimpleToolbar(
+                    controller: _titleController,
+                    config: const quill.QuillSimpleToolbarConfig(
+                        showFontFamily: false,
+                        showFontSize: false,
+                        showBoldButton: true,
+                        showItalicButton: true,
+                        showUnderLineButton: true,
+                        showStrikeThrough: true,
+                        showColorButton: false,
+                        showBackgroundColorButton: false,
+                        showListNumbers: false,
+                        showListBullets: false,
+                        showListCheck: false,
+                        showCodeBlock: false,
+                        showQuote: false,
+                        showIndent: false,
+                        showLink: false,
+                        showDirection: false,
+                        showSearchButton: false,
+                        showSubscript: false,
+                        showSuperscript: false,
+                        multiRowsDisplay: false,
+                    ),
+                ),
+            ),
+            Container(
+                constraints: const BoxConstraints(minHeight: 100),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+                    color: Colors.white,
+                ),
+                child: quill.QuillEditor.basic(
+                    controller: _titleController,
+                    config: const quill.QuillEditorConfig(
+                        placeholder: "Inserisci il titolo...",
+                        scrollable: false,
+                        expands: false,
+                        padding: EdgeInsets.zero,
+                        autoFocus: false,
+                    ),
+                ),
+            ),
+        ];
+    }    
+    
+    List<Widget> _abstractForm() {
+        return [
+            const Text(
+                'Abstract',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8.0),
+            Container(
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                ),
+                child: quill.QuillSimpleToolbar(
+                    controller: _abstractController,
+                    config: const quill.QuillSimpleToolbarConfig(
+                        showFontFamily: false,
+                        showFontSize: false,
+                        showBoldButton: true,
+                        showItalicButton: true,
+                        showUnderLineButton: true,
+                        showStrikeThrough: true,
+                        showColorButton: false,
+                        showBackgroundColorButton: false,
+                        showListNumbers: true,
+                        showListBullets: true,
+                        showListCheck: true,
+                        showCodeBlock: true,
+                        showQuote: true,
+                        showIndent: true,
+                        showLink: false,
+                        showDirection: false,
+                        showSearchButton: false,
+                        showSubscript: false,
+                        showSuperscript: false,
+                        multiRowsDisplay: false,
+                    ),
+                ),
+            ),
+            Container(
+                constraints: const BoxConstraints(minHeight: 100),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+                    color: Colors.white,
+                ),
+                child: quill.QuillEditor.basic(
+                    controller: _abstractController,
+                    config: const quill.QuillEditorConfig(
+                        placeholder: "Inserisci l'abstract...",
+                        scrollable: true,
+                        expands: false,
+                        padding: EdgeInsets.zero,
+                        autoFocus: false,
+                    ),
+                ),
+            ),
+        ];
+    }
+
+    List<Widget> _bodyForm() {
+        return [
+            const Text(
+                'Contenuto',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8.0),
+            Container(
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                ),
+                child: quill.QuillSimpleToolbar(
+                    controller: _bodyController,
+                    config: const quill.QuillSimpleToolbarConfig(
+                        showFontFamily: false,
+                        showFontSize: false,
+                        showBoldButton: true,
+                        showItalicButton: true,
+                        showUnderLineButton: true,
+                        showStrikeThrough: true,
+                        showColorButton: false,
+                        showBackgroundColorButton: false,
+                        showListNumbers: true,
+                        showListBullets: true,
+                        showListCheck: true,
+                        showCodeBlock: true,
+                        showQuote: true,
+                        showIndent: true,
+                        showLink: true,
+                        showDirection: false,
+                        showSearchButton: false,
+                        showSubscript: false,
+                        showSuperscript: false,
+                        multiRowsDisplay: false,
+                    ),
+                ),
+            ),
+            Container(
+                constraints: const BoxConstraints(minHeight: 100),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+                    color: Colors.white,
+                ),
+                child: quill.QuillEditor.basic(
+                    controller: _bodyController,
+                    config: const quill.QuillEditorConfig(
+                        placeholder: "Inserisci il contenuto...",
+                        scrollable: true,
+                        expands: false,
+                        padding: EdgeInsets.zero,
+                        autoFocus: false,
+                    ),
+                ),
+            ),
+        ];
+    }
+}
+
+class FormUtils {
+    static quill.QuillController _initController(String? value) {
+        if (value == null || value.isEmpty) {
+        return quill.QuillController.basic();
+        }
+        try {
+        final decoded = jsonDecode(value);
+        return quill.QuillController(
+            document: quill.Document.fromJson(decoded),
+            selection: const TextSelection.collapsed(offset: 0),
+        );
+        } catch (e) {
+        // Fallback in caso il titolo non sia in formato JSON (Delta)
+        return quill.QuillController(
+            document: quill.Document()..insert(0, value),
+            selection: const TextSelection.collapsed(offset: 0),
+        );
+        }
+    }
+}
