@@ -15,5 +15,9 @@ class Endpoints
 
     static String subcategory(String category) {
         return "${CATEGORY}/${category}/subcategories";
+    }   
+
+    static String category_articles(String category) {
+        return "${CATEGORY}/${category}/articles";
     }
 }

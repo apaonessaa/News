@@ -1,5 +1,6 @@
 package com.app.news.services;
 
+import com.app.news.entities.Article;
 import com.app.news.entities.Category;
 import com.app.news.entities.SubCategory;
 import com.app.news.exceptions.CreateException;
@@ -8,6 +9,7 @@ import com.app.news.exceptions.NotFoundException;
 import com.app.news.exceptions.UpdateException;
 import com.app.news.repositories.CategoryRepository;
 import com.app.news.services.interfaces.IService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -77,18 +79,6 @@ public class CategoryService implements IService<Category, String>
         catrepo.delete(cat);
     }
 
-    public List<Category> getAll()
-    {
-        Sort sort = Sort.by("name").ascending();
-        return catrepo.findAll(sort);
-    }
-
-    public List<SubCategory> getAll(String catname)
-    {
-        Category cat = get(catname);
-        return subcatserv.getAll(cat);
-    }
-
     public SubCategory getSubCat(String catname, String subcatname)
     {
         Category cat = get(catname);
@@ -114,5 +104,30 @@ public class CategoryService implements IService<Category, String>
         String catname = e.getCategory().getName();
         Category cat = get(catname);
         subcatserv.delete(cat, e);
+    }
+
+    public List<Category> getAll()
+    {
+        Sort sort = Sort.by("name").ascending();
+        return catrepo.findAll(sort);
+    }
+
+    public List<SubCategory> getAll(String catname)
+    {
+        Category cat = get(catname);
+        return subcatserv.getAll(cat);
+    }
+
+    public Page<Article> getAll(String catname, int pageNumber, int pageSize)
+    {
+        Category cat = get(catname);
+        return subcatserv.getAll(cat, pageNumber, pageSize);
+    }
+
+    public Page<Article> getAll(String catname, String subcatname, int pageNumber, int pageSize)
+    {
+        Category cat = get(catname);
+        SubCategory subcat = subcatserv.get(cat, subcatname);
+        return subcatserv.getAll(subcat, pageNumber, pageSize);
     }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:newsweb/model/retrive_data.dart';
 import 'package:newsweb/model/entity/category.dart';
 import 'package:newsweb/view/layout/util.dart';
@@ -73,20 +74,26 @@ class _CategoryDrawer extends State<CategoryDrawer> {
                   itemBuilder: (context, index) {
                     return ExpansionTile(
                       tilePadding: EdgeInsets.symmetric(horizontal: 16.0),
-                      title: Text(
-                        categories[index].name,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white,
+                      title: TextButton(
+                        onPressed: () => context.go('/'),
+                        child: Text(
+                          categories[index].name,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       children: [
                         if (selectedCategoryIndex == index)
                           ...categories[index].subcategory.map((subcategory) {
                             return ListTile(
-                              title: Text(
-                                subcategory,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.white,
+                              title: TextButton(
+                                onPressed: () => context.go('/'),
+                                child: Text(
+                                  subcategory,
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             );

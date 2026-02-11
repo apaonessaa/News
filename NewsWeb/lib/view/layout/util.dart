@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:newsweb/view/layout/custom_page.dart';
 
 class NavigationService 
 { 
@@ -81,6 +82,14 @@ class Util
 
 ///////////////////////// LAYOUT /////////////////////////////////
 final class UtilsLayout {
+  // set the Width by Context
+  static double setWidth(BuildContext context) {
+    return MediaQuery.of(context).size.width*0.75; 
+  }
+  // set the Height by Context
+  static double setHeight(BuildContext context) {
+    return MediaQuery.of(context).size.height*1.0; 
+  }
   // Boxed Content
   static Widget layout(List<Widget> content, double maxWidth) {
     return SizedBox(

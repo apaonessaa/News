@@ -10,14 +10,16 @@ import 'package:newsweb/view/layout/article_page/stack_article.dart';
 import 'package:newsweb/view/layout/cat_subcat_footer.dart';
 import 'package:newsweb/view/layout/util.dart';
 
-class MainPage extends StatefulWidget 
-{ 
-    const MainPage({super.key}); 
-    @override _MainPage createState() => _MainPage(); 
+class CategoryPage extends StatefulWidget {
+  final String categoryName;
+
+  const CategoryPage({super.key, required this.categoryName});
+
+  @override
+  _CategoryPageState createState() => _CategoryPageState();
 }
 
-class _MainPage extends State<MainPage> 
-{
+class _CategoryPageState extends State<CategoryPage> {
   late List<Article> articles;
   bool isLoading = true;
   bool hasError = false;
@@ -34,15 +36,15 @@ class _MainPage extends State<MainPage>
     _loadArticles();
   }
 
-  Future<void> _loadArticles() async 
-  {
+  Future<void> _loadArticles() async {
     try {
-      final result = await RetriveData.sharedInstance.getMainArticles(pageNumber, pageSize);
+      final result = await RetriveData.sharedInstance.getArticleByCategory(
+          widget.categoryName, pageNumber, pageSize);
       setState(() {
         if (result != null) {
           articles = result.content;
-          page = List.from(articles); 
-          maxPageNumber = result.totalPages; 
+          page = List.from(articles);
+          maxPageNumber = result.totalPages;
         }
         isLoading = false;
       });
@@ -51,6 +53,26 @@ class _MainPage extends State<MainPage>
         isLoading = false;
         hasError = true;
       });
+    }
+  }
+
+  void _nextPage() {
+    if (pageNumber < maxPageNumber - 1) {
+      setState(() {
+        pageNumber++;
+        isLoading = true;
+      });
+      _loadArticles();
+    }
+  }
+
+  void _previousPage() {
+    if (pageNumber > 0) {
+      setState(() {
+        pageNumber--;
+        isLoading = true;
+      });
+      _loadArticles();
     }
   }
 
@@ -87,13 +109,13 @@ class _MainPage extends State<MainPage>
         ],
         content: [
           UtilsLayout.layout(
-            [ Util.error("Errore nel caricamento dell'articolo.") ], 
-            maxWidth
+            [Util.error("Errore nel caricamento dell'articolo.")],
+            maxWidth,
           ),
           const SizedBox(height: 100),
           const SizedBox.shrink(),
           const CatAndSubcatFooter(),
-        ]
+        ],
       );
     }
 
@@ -109,7 +131,7 @@ class _MainPage extends State<MainPage>
         UtilsLayout.layout(_build(context), maxWidth),
         const SizedBox(height: 100),
         const SizedBox.shrink(),
-        const CatAndSubcatFooter()
+        const CatAndSubcatFooter(),
       ],
     );
   }
@@ -120,7 +142,15 @@ class _MainPage extends State<MainPage>
     }
 
     return [
-      const SizedBox(height: 40.0),
+        const SizedBox(height: 40.0),
+
+        Text(
+            widget.categoryName,
+            style: Theme.of(context).textTheme.displayMedium,
+            textAlign: TextAlign.start,
+        ),
+
+        const SizedBox(height: 40.0),
 
       // LAYER #1: Primo articolo in cima
       if (page.isNotEmpty)
@@ -202,6 +232,48 @@ class _MainPage extends State<MainPage>
           ],
         ),
       ],
+        
+        // Paginazione
+        // Paginazione con pulsanti e testo all'estremo destro
+        const Spacer(flex: 1),
+        Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+                IconButton(
+                    icon: const Icon(Icons.arrow_circle_left, color: Colors.red),
+                    onPressed: () {
+                        // update page number and full state
+                        if(pageNumber>0) {
+                            pageNumber-=1;
+                            _previousPage();
+                        }
+                    },
+                ),
+                IconButton(
+                    icon: const Icon(Icons.arrow_circle_right, color: Colors.red),
+                    onPressed: () {
+                        // update page number and full state
+                        if (pageNumber+1<maxPageNumber) {
+                            pageNumber+=1;
+                            _nextPage();
+                        }
+                    },
+                ),
+            ],
+        ),
+
+        Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+                Text(
+                    '${maxPageNumber!=0 ? pageNumber+1 : pageNumber}/$maxPageNumber', 
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary, 
+                        fontSize: 12.0, 
+                        fontWeight: FontWeight.normal),
+                ),
+            ],
+        ),
     ];
   }
 }

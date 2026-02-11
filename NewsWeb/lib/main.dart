@@ -4,27 +4,28 @@ import 'package:newsweb/view/theme/theme.dart';
 import 'package:newsweb/view/theme/text_theme.dart';
 import 'package:newsweb/view/layout/util.dart';
 import 'package:newsweb/view/main_page.dart';
+import 'package:newsweb/view/article_page.dart';
+import 'package:newsweb/view/category_page.dart';
 
 void main() 
 {
   runApp(App());
 }
 
-class App extends StatefulWidget {
+class App extends StatefulWidget 
+{
   const App({super.key});
 
   @override
   State<App> createState() => _App();
 }
 
-class _App extends State<App> {
+class _App extends State<App> 
+{
   @override
   Widget build(BuildContext context) {
-    // Imposta il tema della tua app
     TextTheme textTheme = createTextTheme(context, "Atkinson Hyperlegible", "Atkinson Hyperlegible");
     MaterialTheme theme = MaterialTheme(textTheme);
-
-    /// La configurazione delle route
     final GoRouter router = GoRouter(
       navigatorKey: NavigationService.navigatorKey,
       routes: <RouteBase>[
@@ -38,8 +39,7 @@ class _App extends State<App> {
               path: '/art/:title',
               builder: (BuildContext context, GoRouterState state) {
                 final title = state.pathParameters['title']!; 
-                //return ArticlePage(title: title);
-                return MainPage();
+                return ArticlePage(title: title);
               },
             ),
             GoRoute(
@@ -47,13 +47,14 @@ class _App extends State<App> {
               builder: (BuildContext context, GoRouterState state) {
                 final name = state.pathParameters['name']!; 
                 //return CategoryPage(catname: catname ?? 'Unknown Category');
-                return MainPage();
+                return CategoryPage(categoryName: name);
               },
             ),
             GoRoute(
-              path: '/subcat/:name',
+              path: '/cat/:cname/subcat/:scname',
               builder: (BuildContext context, GoRouterState state) {
-                final name = state.pathParameters['name']!; 
+                final category = state.pathParameters['cname']!; 
+                final subcategory = state.pathParameters['scname']!; 
                 //return SubcategoryPage(subcatname: subcatname ?? 'Unknown Subcategory');
                 return MainPage();
               },
@@ -72,7 +73,21 @@ class _App extends State<App> {
     return MaterialApp.router(
       routerConfig: router,
       debugShowCheckedModeBanner: false,
-      theme: theme.lightMediumContrast(),
+      theme: ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.light,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.red
+    ),
+    colorScheme: ColorScheme.fromSeed(
+      brightness: Brightness.light,
+      seedColor: const Color.fromARGB(255, 136, 136, 136),
+      primary: Colors.white,
+      onPrimary: Colors.black,
+      secondary: Colors.white,
+      onSecondary: Colors.black
+    )
+  ),
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.1)),

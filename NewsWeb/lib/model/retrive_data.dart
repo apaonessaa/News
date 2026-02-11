@@ -9,6 +9,30 @@ class RetriveData
 {
     static RetriveData sharedInstance = RetriveData();
 
+    Future<PaginatedArticles?> getArticleByCategory(String cat, int pageNumber, int pageSize) async 
+    {
+        try {
+            dynamic response = await Service.request(
+            HttpMethod.GET,
+            Endpoints.REMOTE_API,
+            Endpoints.category_articles(cat),
+            params: {
+                'pageNumber': '$pageNumber',
+                'pageSize': '$pageSize',
+            },
+            );
+
+            if (response != null && response is Map<String, dynamic>) {
+            print("API response: $response"); 
+            return PaginatedArticles.fromJson(response);
+            }
+            return null;
+        } catch (error) {
+            print("Error fetching articles: $error");
+            throw Exception('Error fetching articles');
+        }
+    }
+
     Future<PaginatedArticles?> getMainArticles(int pageNumber, int pageSize) async 
     {
         try {
@@ -32,7 +56,6 @@ class RetriveData
             throw Exception('Error fetching articles');
         }
     }
-
 
     Future<Article> getArticle(String title) async 
     {

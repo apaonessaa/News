@@ -1,13 +1,16 @@
 package com.app.news.controllers;
 
+import com.app.news.controllers.dto.ArticleDTO;
 import com.app.news.controllers.dto.CategoryDTO;
 import com.app.news.controllers.dto.SubCategoryDTO;
+import com.app.news.controllers.mappers.ArticleMapper;
 import com.app.news.controllers.mappers.CategoryMapper;
 import com.app.news.controllers.mappers.SubCategoryMapper;
 import com.app.news.entities.Category;
 import com.app.news.entities.SubCategory;
 import com.app.news.services.CategoryService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +24,18 @@ public class CategoryController
     private final CategoryService catserv;
     private final CategoryMapper catmap;
     private final SubCategoryMapper subcatmap;
+    private final ArticleMapper artmap;
 
-    public CategoryController(CategoryService catserv, CategoryMapper catmap, SubCategoryMapper subcatmap)
+    public CategoryController(
+            CategoryService catserv,
+            CategoryMapper catmap,
+            SubCategoryMapper subcatmap,
+            ArticleMapper artmap)
     {
         this.catserv = catserv;
         this.catmap = catmap;
         this.subcatmap = subcatmap;
+        this.artmap = artmap;
     }
 
     /**
@@ -83,6 +92,22 @@ public class CategoryController
                 .build();
     }
 
+    @GetMapping("/{cat}/articles")
+    public ResponseEntity<Page<ArticleDTO>> get(
+            @PathVariable String cat,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+        if (pageNumber < 0)
+            pageNumber = 0;
+        if (pageSize <= 0)
+            pageSize = 10;
+        Page<ArticleDTO> arts = catserv.getAll(cat, pageNumber, pageSize).map(artmap::toDTO);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(arts);
+    }
+
     /**
      * SubCategory
      * */
@@ -129,5 +154,22 @@ public class CategoryController
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
+    }
+
+    @GetMapping("/{cat}/subcategories/{name}/articles")
+    public ResponseEntity<Page<ArticleDTO>> get(
+            @PathVariable String cat,
+            @PathVariable String name,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "10") int pageSize
+    ) {
+        if (pageNumber < 0)
+            pageNumber = 0;
+        if (pageSize <= 0)
+            pageSize = 10;
+        Page<ArticleDTO> arts = catserv.getAll(cat, name, pageNumber, pageSize).map(artmap::toDTO);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(arts);
     }
 }

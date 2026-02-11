@@ -18,37 +18,28 @@ class _CustomPage extends State<CustomPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: NavigationService.scaffoldKey,
       appBar: AppBar(
+        backgroundColor: Colors.red,
         automaticallyImplyLeading: false,
         actions: widget.actions,
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            NavigationService.scaffoldKey.currentState?.openDrawer();
-          },
+        //leading: IconButton(
+        //  icon: Icon(Icons.menu),
+        //  onPressed: () {
+        //    NavigationService.scaffoldKey.currentState?.openDrawer();
+        //  },
         ),
+      body: Stack(
+        children: [
+          ListView(
+            padding: const EdgeInsets.all(8.0),
+            controller: scrollController,
+            children: [
+              ...widget.content,
+            ],
+          ),
+        ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          double horizontalPadding = constraints.maxWidth > 600 ? 65.0 : 20.0;
-          return SingleChildScrollView(
-            child: SizedBox(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: 25.0,
-                  horizontal: horizontalPadding,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: widget.content,
-                ),
-              ),
-            ),
-          );
-        }
-      ),
-      drawer: _buildCustomDrawer(),
+      //drawer: _buildCustomDrawer(),
     );
   }
 

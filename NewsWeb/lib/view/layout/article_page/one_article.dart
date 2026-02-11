@@ -45,9 +45,7 @@ class OneArticle extends StatelessWidget {
           borderRadius: BorderRadius.zero,
         ),
         child: ListTile(
-          onTap: () {
-            // go to Content on tap
-          },
+          onTap: () => context.go('/art/${article!.title}'),
           title: Padding(
             padding: const EdgeInsets.only(
               left: 0.5, 
@@ -65,11 +63,10 @@ class OneArticle extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.start,
-                //style: TextStyle(
-                //  fontSize: 24,
-                //  fontWeight: FontWeight.bold,
-                //  color: Theme.of(context).colorScheme.onSecondary,
-                //),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 10.0),
               if (withSummary) ...[
@@ -78,11 +75,7 @@ class OneArticle extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.start,
-                  //style: TextStyle(
-                  //  fontSize: 15,
-                  //  fontWeight: FontWeight.normal,
-                  //  color: Theme.of(context).colorScheme.onSecondary,
-                  //),
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ],
             ],
