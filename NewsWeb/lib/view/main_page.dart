@@ -104,6 +104,11 @@ class _MainPage extends State<MainPage>
           'Home',
           () => context.go('/'),
         ),
+        Util.btn(
+            Icons.webhook,
+            'Admin',
+            () => context.go('/admin'),
+          ),
       ],
       content: [
         UtilsLayout.layout(_build(context), maxWidth),

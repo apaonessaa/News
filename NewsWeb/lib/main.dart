@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:newsweb/view/theme/theme.dart';
 import 'package:newsweb/view/theme/text_theme.dart';
@@ -7,9 +8,11 @@ import 'package:newsweb/view/main_page.dart';
 import 'package:newsweb/view/article_page.dart';
 import 'package:newsweb/view/category_page.dart';
 import 'package:newsweb/view/subcategory_page.dart';
+import 'package:newsweb/view/admin_page.dart';
 
 void main() 
 {
+  setUrlStrategy(PathUrlStrategy());
   runApp(App());
 }
 
@@ -61,7 +64,14 @@ class _App extends State<App>
             GoRoute(
               path: '/admin',
               builder: (BuildContext context, GoRouterState state) {
-                return MainPage();
+                return AdminPage();
+              },
+            ),
+            GoRoute(
+              path: '/admin/article/:title/form',
+              builder: (BuildContext context, GoRouterState state) {
+                final title = state.pathParameters['title']!; 
+                return AdminPage();
               },
             ),
           ],
