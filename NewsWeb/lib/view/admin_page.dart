@@ -197,7 +197,7 @@ class ListOfArticlesToModify extends StatelessWidget {
                   if (index > 0) Divider(),
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                    onTap: () => context.go('/admin/article/'), //context.go('/admin/article/${articles![index].title}/form'),
+                    onTap: () => context.go('/admin/article/${articles![index].title}/update'),
                     leading: ImageViewer(title: articles![index].title),
                     title: Text(
                         articles![index].title,

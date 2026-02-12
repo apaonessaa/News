@@ -69,9 +69,10 @@ class _App extends State<App> {
               },
             ),
             GoRoute(
-              path: '/admin/article',
+              path: '/admin/article/:title/update',
               builder: (BuildContext context, GoRouterState state) {
-                return ArticleFormPage();
+                final title = state.pathParameters['title']!;
+                return ArticleFormPage(title: title);
               },
             ),
           ],
