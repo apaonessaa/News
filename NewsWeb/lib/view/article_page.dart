@@ -6,6 +6,7 @@ import 'package:newsweb/view/layout/custom_page.dart';
 import 'package:newsweb/view/layout/cat_subcat_footer.dart';
 import 'package:newsweb/view/layout/image_viewer.dart';
 import 'package:newsweb/view/layout/util.dart';
+import 'package:newsweb/view/layout/quill_text_display.dart';
 
 class ArticlePage extends StatefulWidget 
 {
@@ -111,7 +112,7 @@ class _ArticlePage extends State<ArticlePage>
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                    const SizedBox(height: 40.0),
+                    const SizedBox(height: 10.0),
 
                     // Category
                     GestureDetector(
@@ -125,21 +126,31 @@ class _ArticlePage extends State<ArticlePage>
                         )
                     ),
 
-                    const SizedBox(height: 10),
-                    Text(
-                        art!.title,
-                        style: Theme.of(context).textTheme.titleLarge,
-                        textAlign: TextAlign.start,
-                    ),
-                
-                    const SizedBox(height: 20),
-
+                    const SizedBox(height: 30),
+                    
                     // Article Image
                     Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                         child: ImageViewer(title: art!.title)
                     ),
 
+                    const SizedBox(height: 15),
+                    Text(
+                        art!.title,
+                        style: Theme.of(context).textTheme.titleLarge,
+                        textAlign: TextAlign.start,
+                    ),
+                
+                    const SizedBox(height: 10),
+
+                    QuillTextDisplay(text: art!.summary),
+                    //Text(
+                    //    art!.summary,
+                    //    style: Theme.of(context).textTheme.bodyLarge,
+                    //    textAlign: TextAlign.start,
+                    //),
+                    const SizedBox(height: 10),
+                    const Divider(),
                     const SizedBox(height: 10),
 
                     // Subcategory
@@ -159,6 +170,7 @@ class _ArticlePage extends State<ArticlePage>
                                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                                 fontWeight: FontWeight.normal,
                                                 fontSize: 15,
+                                                color: Colors.white,
                                             )                                    
                                         )
                                     )
@@ -166,20 +178,13 @@ class _ArticlePage extends State<ArticlePage>
                             })
                         ]
                     ),
-
-                    const SizedBox(height: 10),
-                    Text(
-                        art!.summary,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                        textAlign: TextAlign.start,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                        art!.content,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        textAlign: TextAlign.start,
-                    ),     
-
+                    const SizedBox(height: 20),
+                    QuillTextDisplay(text: art!.content),
+                    //Text(
+                    //    art!.content,
+                    //    style: Theme.of(context).textTheme.bodyMedium,
+                    //    textAlign: TextAlign.start,
+                    //),     
                 ],
             ),
         ];

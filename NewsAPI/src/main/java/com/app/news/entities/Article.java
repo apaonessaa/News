@@ -23,9 +23,11 @@ public class Article
     private String title;
 
     @NotNull @Getter
+    @Column(columnDefinition = "TEXT")
     private String summary;
 
     @NotNull @Getter
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @OneToOne(

@@ -123,10 +123,14 @@ class _ArticleFormPage extends State<ArticleFormPage> {
       isSaving = true;
     });
 
-    String _title = jsonEncode(_titleController.document.toDelta().toJson());
+    String _title = _titleController.document.toPlainText()
+    .replaceAll(RegExp(r'[^\w\s-]'), '')  // Rimuove tutto tranne lettere, numeri, spazi e trattini
+    .replaceAll(RegExp(r'\s+'), ' ')      // Riduce gli spazi consecutivi a uno solo
+    .trim();                             // Rimuove gli spazi all'inizio e alla fine
     String _summary = jsonEncode(_abstractController.document.toDelta().toJson());
     String _content = jsonEncode(_bodyController.document.toDelta().toJson());
 
+    print(_title);
     print(selectedCategory);
     print(selectedSubcategories);
     
@@ -213,38 +217,7 @@ class _ArticleFormPage extends State<ArticleFormPage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8.0),
-            Container(
-                decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                ),
-                child: quill.QuillSimpleToolbar(
-                    controller: _titleController,
-                    config: const quill.QuillSimpleToolbarConfig(
-                        showFontFamily: false,
-                        showFontSize: false,
-                        showBoldButton: true,
-                        showItalicButton: true,
-                        showUnderLineButton: true,
-                        showStrikeThrough: true,
-                        showColorButton: false,
-                        showBackgroundColorButton: false,
-                        showListNumbers: false,
-                        showListBullets: false,
-                        showListCheck: false,
-                        showCodeBlock: false,
-                        showQuote: false,
-                        showIndent: false,
-                        showLink: false,
-                        showDirection: false,
-                        showSearchButton: false,
-                        showSubscript: false,
-                        showSuperscript: false,
-                        multiRowsDisplay: false,
-                    ),
-                ),
-            ),
+
             Container(
                 constraints: const BoxConstraints(minHeight: 100),
                 padding: const EdgeInsets.all(12),
@@ -302,7 +275,7 @@ class _ArticleFormPage extends State<ArticleFormPage> {
                         showSearchButton: false,
                         showSubscript: false,
                         showSuperscript: false,
-                        multiRowsDisplay: false,
+                        multiRowsDisplay: true,
                     ),
                 ),
             ),

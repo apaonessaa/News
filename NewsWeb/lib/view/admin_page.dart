@@ -101,18 +101,6 @@ class _AdminPage extends State<AdminPage>
 
     List<Widget> _build(BuildContext context) 
     {
-        if (isLoading) {
-            return [ Util.isLoading() ];
-        }
-
-        if (hasError) {
-            return [ Util.error("Errore nel caricamento dell'articolo.") ];
-        }
-
-        if (page.isEmpty) {
-            return [const Text("Nessun articolo disponibile.")];
-        }
-
         return [
             const SizedBox(height: 20.0),
             Row(
@@ -166,6 +154,13 @@ class _AdminPage extends State<AdminPage>
                     ),
                 ],
             ),
+            const SizedBox(height: 50.0),
+            if (isLoading) 
+                Util.isLoading(),
+            if (hasError)
+                Util.error("Errore nel caricamento dell'articolo."),
+            if (page.isEmpty)
+                const Text("Nessun articolo disponibile."),
             if (page.isNotEmpty)
                 Layer(
                     widgets: [
@@ -174,6 +169,7 @@ class _AdminPage extends State<AdminPage>
                         ),
                     ]
                 ),
+
             const SizedBox(height: 20.0),
             const Spacer(flex: 1),
             Row(

@@ -80,6 +80,7 @@ public class ArticleController
                 .body(artmap.toDTO(art));
     }
 
+    @CrossOrigin(origins = "http://localhost:8080")
     @GetMapping("/{title}/image")
     public ResponseEntity<byte[]> getImage(@PathVariable String title)
     {

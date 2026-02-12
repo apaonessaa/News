@@ -2,7 +2,6 @@ package com.app.news.configurations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -10,7 +9,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-@Profile("dev")
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration
@@ -38,4 +36,18 @@ public class SecurityConfiguration
         source.registerCorsConfiguration("/**", config);
         return source;
     }
+
+    /**
+     * @Configuration
+     * public class WebConfig implements WebMvcConfigurer {
+     *
+     *     @Override
+     *     public void addCorsMappings(CorsRegistry registry) {
+     *         registry.addMapping("/**")
+     *                 .allowedOrigins("http://localhost:8080")
+     *                 .allowedMethods("GET", "POST", "PUT", "DELETE")
+     *                 .allowedHeaders("*");
+     *     }
+     * }
+     * */
 }

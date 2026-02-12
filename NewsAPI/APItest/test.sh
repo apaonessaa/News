@@ -1,11 +1,8 @@
 #!/bin/bash
 
-curl -i -X POST --header 'Content-Type: application/json' --data '{"name":"world", "description": "The word is World.", "subcategories":[]}' http://localhost:8081/api/categories
+curl -i -X POST --header 'Content-Type: application/json' --data '{"name":"Mondo", "description": "Il mondo è fatto di fatti, avvenimenti e tutto ciò che può assomigliare a qualcosa di strano e insospettabilmente sano.", "subcategories":[]}' http://localhost:8081/api/categories
 
-curl -i -X POST --header 'Content-Type: application/json' --data '{"name":"europe", "description": "EU stands for Europe.", "category":"world", "articles":[]}' http://localhost:8081/api/categories/world/subcategories
+curl -i -X POST --header 'Content-Type: application/json' --data '{"name":"Europa", "description": "EU deriva da EUropa.", "category":"Mondo", "articles":[]}' http://localhost:8081/api/categories/Mondo/subcategories
 
-curl -i -X POST http://localhost:8081/api/articles \
-  -H "Content-Type: multipart/form-data" \
-  -F 'article=@article.json;type=application/json' \
-  -F 'image=@./cat.png'
+curl -i -X POST --header 'Content-Type: application/json' --data $'{"name":"Stati Uniti d\'America", "description": "Maledetti USA. Usa e getta.", "category":"Mondo", "articles":[]}' http://localhost:8081/api/categories/Mondo/subcategories
 
