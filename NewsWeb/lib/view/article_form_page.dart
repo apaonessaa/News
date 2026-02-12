@@ -5,6 +5,7 @@ import 'package:newsweb/model/entity/article.dart';
 import 'package:newsweb/model/entity/category.dart';
 import 'package:newsweb/view/layout/custom_page.dart';
 import 'package:newsweb/view/layout/util.dart';
+import 'package:newsweb/view/layout/image_viewer.dart';
 import 'package:newsweb/view/layout/article_page/layer.dart';
 import 'dart:convert';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
@@ -105,7 +106,7 @@ class _ArticleFormPage extends State<ArticleFormPage> {
         });
       }
     }
-  }
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -321,20 +322,50 @@ class _ArticleFormPage extends State<ArticleFormPage> {
         ];
     }
 
-    List<Widget> _buildImage() {
-      return [
+List<Widget> _buildImage() {
+  return [
+    Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (widget.title != null) ...[
+          SizedBox(
+            width: 200,
+            child: ImageViewer(title: widget.title!),
+          ),
+          const SizedBox(width: 10.0),
+        ],
         Center(
           child: imageBytes == null
-            ? Icon(Icons.image, size: 100, color: Colors.grey)
-            : Image.memory(imageBytes!),
+              ? const Icon(Icons.image, size: 200, color: Colors.grey)
+              : ClipRRect(
+                  child: Image.memory(
+                    imageBytes!, 
+                    height: 200,
+                    width: 200, 
+                    fit: BoxFit.cover,
+                  ),
+                ),
         ),
-        const SizedBox(height: 20.0),
-        ElevatedButton(
+      ],
+    ),
+    
+    const SizedBox(height: 10.0),
+    Center(
+      child: SizedBox(
+        width: 120,
+        height: 30,
+        child: ElevatedButton(
           onPressed: chooseImage,
-          child: Text('Carica immagine'),
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.zero,
+            textStyle: const TextStyle(fontSize: 11),
+          ),
+          child: const Text('Carica immagine'),
         ),
-      ];
-    }
+      ),
+    ),
+  ];
+}
 
     void chooseImage() async {
       setState(() {
