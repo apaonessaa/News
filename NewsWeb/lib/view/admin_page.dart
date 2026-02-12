@@ -114,6 +114,58 @@ class _AdminPage extends State<AdminPage>
         }
 
         return [
+            const SizedBox(height: 20.0),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                    SizedBox(
+                    width: 120,
+                    height: 35,
+                    child: ElevatedButton(
+                        onPressed: () => context.go('/admin/article/create'),
+                        style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        child: const Text('Nuovo articolo'),
+                        ),
+                    ),
+
+                    const SizedBox(width: 16), 
+
+                    SizedBox(
+                        width: 120,
+                        height: 35,
+                        child: ElevatedButton(
+                        onPressed: (){},
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.zero,
+                                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                            child: const Text('Modifica categoria'),
+                        ),
+                    ),
+
+                    const SizedBox(width: 16), 
+
+                    SizedBox(
+                        width: 120,
+                        height: 35,
+                        child: ElevatedButton(
+                        onPressed: (){},
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.zero,
+                                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                            child: const Text('Modifica sotto-categoria'),
+                        ),
+                    ),
+                ],
+            ),
             if (page.isNotEmpty)
                 Layer(
                     widgets: [
@@ -130,7 +182,6 @@ class _AdminPage extends State<AdminPage>
                     IconButton(
                         icon: const Icon(Icons.arrow_circle_left, color: Colors.red),
                         onPressed: () {
-                            // update page number and full state
                             if(pageNumber>0) {
                                 pageNumber-=1;
                                 _previousPage();
@@ -140,7 +191,6 @@ class _AdminPage extends State<AdminPage>
                     IconButton(
                         icon: const Icon(Icons.arrow_circle_right, color: Colors.red),
                         onPressed: () {
-                            // update page number and full state
                             if (pageNumber+1<maxPageNumber) {
                                 pageNumber+=1;
                                 _nextPage();

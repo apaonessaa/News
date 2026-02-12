@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:newsweb/model/retrive_data.dart';
+import 'package:newsweb/model/send_data.dart';
 import 'package:newsweb/model/entity/article.dart';
 import 'package:newsweb/model/entity/category.dart';
 import 'package:newsweb/view/layout/custom_page.dart';
@@ -36,6 +37,7 @@ class _ArticleFormPage extends State<ArticleFormPage> {
 
   FilePickerResult? pickedFile;
   Uint8List? imageBytes;
+  String? imageFilename;
   bool isLoadingImageUploaded = true;
   bool hasErrorImageUploaded = false;
 
@@ -111,7 +113,63 @@ class _ArticleFormPage extends State<ArticleFormPage> {
         });
       }
     }
-  } 
+  }
+
+
+  bool isSaving = false;
+
+  void save() async {
+    setState(() {
+      isSaving = true;
+    });
+
+    String _title = jsonEncode(_titleController.document.toDelta().toJson());
+    String _summary = jsonEncode(_abstractController.document.toDelta().toJson());
+    String _content = jsonEncode(_bodyController.document.toDelta().toJson());
+
+    print(selectedCategory);
+    print(selectedSubcategories);
+    
+    if (selectedCategory == null || selectedSubcategories.isEmpty) {
+      print("Categoria e sotto-categorie non valide.");
+      setState(() {
+        isSaving = false;
+      });
+      return;
+    }
+
+    Article art = Article(
+      title: _title,
+      summary: _summary,
+      content: _content,
+      category: selectedCategory!.name,
+      subcategory: selectedSubcategories,
+      image: 'image',
+    );
+
+    if (imageFilename == null || imageBytes == null) {
+      print("Immagine non selezionata");
+      setState(() {
+        isSaving = false;
+      });
+      return;
+    }
+
+    try {
+      await SendData.sharedInstance.save(art, imageBytes!, imageFilename!);
+    } catch (e) {
+      print("Errore durante il salvataggio: $e");
+    }
+
+    setState(() {
+      isSaving = false;
+    });
+  }
+
+
+  void delete() async {
+    
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +198,8 @@ class _ArticleFormPage extends State<ArticleFormPage> {
                 ..._buildImage(),
                 const SizedBox(height: 30),
                 ..._buildCategory(),
+                const SizedBox(height: 70),
+                ..._buildSaveAndDelete(),
             ],
         const SizedBox(height: 100),
       ],
@@ -386,10 +446,15 @@ class _ArticleFormPage extends State<ArticleFormPage> {
       });
 
       try {
-        pickedFile = await FilePicker.platform.pickFiles();
+        pickedFile = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['jpg', 'png'],
+        );
         if (pickedFile != null && pickedFile!.files.isNotEmpty) {
           setState(() {
-            imageBytes = pickedFile!.files.first.bytes;
+            final file = pickedFile!.files.first;
+            imageBytes = file.bytes;
+            imageFilename = file.name;
           });
         } else {
           setState(() {
@@ -410,7 +475,6 @@ class _ArticleFormPage extends State<ArticleFormPage> {
 
     List<Widget> _buildCategory() {
       return [
-        // Sezione Selezione Categoria
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -428,23 +492,19 @@ class _ArticleFormPage extends State<ArticleFormPage> {
             )
           ],
         ),
-
-        // Display Nome Categoria
         if (selectedCategory != null) ...[
           Center(
             child: Text(
-              selectedCategory!.name, // Usato ! perché abbiamo controllato che non sia null
+              selectedCategory!.name,
               style: const TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.w500),
             ),
           ),
           const SizedBox(height: 20.0),
-
-          // Sezione Selezione Sotto-categorie
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Sotto-categorie',
+                'Sotto-categorie selezionate:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 8.0),
@@ -458,19 +518,17 @@ class _ArticleFormPage extends State<ArticleFormPage> {
 
         const SizedBox(height: 10.0),
 
-        // Visualizzazione Subcategories tramite Chip
         if (selectedSubcategories.isNotEmpty)
           Center(
             child: Wrap(
-              spacing: 8.0, // Spazio orizzontale tra i chip
-              runSpacing: 4.0, // Spazio verticale tra le righe
+              spacing: 8.0, 
+              runSpacing: 4.0, 
               children: selectedSubcategories.map((sub) {
                 return Chip(
                   label: Text(sub),
                   backgroundColor: Colors.red.withOpacity(0.1),
                   deleteIcon: const Icon(Icons.close, size: 18, color: Colors.red),
                   onDeleted: () {
-                    // Logica opzionale per rimuovere la subcategory direttamente dal chip
                     setState(() {
                       selectedSubcategories.remove(sub);
                     });
@@ -595,6 +653,45 @@ class _ArticleFormPage extends State<ArticleFormPage> {
           ],
         ),
       );
+    }
+
+    List<Widget> _buildSaveAndDelete() {
+      return [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 120,
+              height: 35,
+              child: ElevatedButton(
+                onPressed: save,
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                child: const Text('Salva'),
+              ),
+            ),
+
+            const SizedBox(width: 16), 
+
+            SizedBox(
+              width: 120,
+              height: 35,
+              child: ElevatedButton(
+              onPressed: delete,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.zero,
+                  textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                child: const Text('Cancella'),
+              ),
+            ),
+          ],
+        ),
+      ];
     }
 }
 

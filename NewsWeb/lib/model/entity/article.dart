@@ -6,7 +6,7 @@ class Article
     String category;
     List<String> subcategory;
     String image;
-  
+      
     Article({
         required this.title,
         required this.summary,
