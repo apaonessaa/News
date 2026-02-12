@@ -9,6 +9,9 @@ import 'package:newsweb/view/layout/article_page/layer.dart';
 import 'dart:convert';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 
+import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
+
 class ArticleFormPage extends StatefulWidget {
   final String? title;
   const ArticleFormPage({super.key, this.title});
@@ -25,6 +28,11 @@ class _ArticleFormPage extends State<ArticleFormPage> {
   List<Category> categories = [];
   bool isLoadingCategory = true;
   bool hasErrorCategory = false;
+
+  FilePickerResult? pickedFile;
+  Uint8List? imageBytes;
+  bool isLoadingImageUploaded = true;
+  bool hasErrorImageUploaded = false;
 
   late quill.QuillController _titleController;
   late quill.QuillController _abstractController;
@@ -123,8 +131,7 @@ class _ArticleFormPage extends State<ArticleFormPage> {
                 const SizedBox(height: 30),
                 ..._bodyForm(),
                 const SizedBox(height: 30),
-                // TODO image
-                // TODO category and subcategory
+                ..._buildImage(),
             ],
         const SizedBox(height: 100),
       ],
@@ -312,6 +319,50 @@ class _ArticleFormPage extends State<ArticleFormPage> {
                 ),
             ),
         ];
+    }
+
+    List<Widget> _buildImage() {
+      return [
+        Center(
+          child: imageBytes == null
+            ? Icon(Icons.image, size: 100, color: Colors.grey)
+            : Image.memory(imageBytes!),
+        ),
+        const SizedBox(height: 20.0),
+        ElevatedButton(
+          onPressed: chooseImage,
+          child: Text('Carica immagine'),
+        ),
+      ];
+    }
+
+    void chooseImage() async {
+      setState(() {
+        isLoadingImageUploaded = true;
+        hasErrorImageUploaded = false;
+      });
+
+      try {
+        pickedFile = await FilePicker.platform.pickFiles();
+        if (pickedFile != null && pickedFile!.files.isNotEmpty) {
+          setState(() {
+            imageBytes = pickedFile!.files.first.bytes;
+          });
+        } else {
+          setState(() {
+            hasErrorImageUploaded = true;
+          });
+        }
+      } catch (e) {
+        setState(() {
+          hasErrorImageUploaded = true;
+        });
+        print("Errore durante il caricamento dell'immagine: $e");
+      } finally {
+        setState(() {
+          isLoadingImageUploaded = false;
+        });
+      }
     }
 }
 
