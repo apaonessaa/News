@@ -9,6 +9,18 @@ class NavigationService
 
 class Util
 {
+
+    static notify(BuildContext context, String text, bool error) {
+      if(error) {
+        return ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(text, style: const TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+        );
+      }
+      return ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(text, style: const TextStyle(color: Colors.white)), backgroundColor: Colors.black),
+      );
+    }
+
     static Widget btn(IconData icon, String label, Function() goTo) 
     {
         return Padding(

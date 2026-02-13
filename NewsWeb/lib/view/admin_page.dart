@@ -21,7 +21,7 @@ class _AdminPage extends State<AdminPage>
 
     List<Article> page = [];
     int pageNumber = 0;
-    int pageSize = 6;
+    int pageSize = 4;
     int maxPageNumber = 0;
 
     @override

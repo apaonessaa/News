@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:newsweb/model/service.dart';
 import 'package:newsweb/model/entity/article.dart';
 import 'package:newsweb/model/service.dart';
 import 'package:newsweb/model/endpoints.dart';
@@ -56,6 +57,21 @@ class SendData
             }
         } catch (e) {
             print("Errore durante la richiesta HTTP: $e");
+        }
+    }
+
+    Future<void> delete(String title) async 
+    {
+        try {
+            dynamic response = await Service.request(
+                HttpMethod.DELETE,
+                Endpoints.REMOTE_API,
+                Endpoints.article(title)
+            );
+            print("Articolo eliminato.");
+        } catch (error) {
+            print("Errore con l'eliminazione dell'articolo ${title}");
+            throw Exception(error);
         }
     }
 }

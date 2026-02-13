@@ -44,171 +44,215 @@ class _ArticleFormPage extends State<ArticleFormPage> {
   Category? selectedCategory;
   List<String> selectedSubcategories = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _titleController = quill.QuillController.basic();
-    _abstractController = quill.QuillController.basic(); 
-    _bodyController = quill.QuillController.basic(); 
-    _loadCategories();
-    _loadArticle();
-  }
+  bool isSaving = false;
+  bool isDeleting = false;
 
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _abstractController.dispose();
-    _bodyController.dispose();
-    super.dispose();
-  }
+    @override
+    void initState() {
+      super.initState();
+      _titleController = quill.QuillController.basic();
+      _abstractController = quill.QuillController.basic(); 
+      _bodyController = quill.QuillController.basic(); 
+      _loadCategories();
+      _loadArticle();
+    }
 
-  void _loadArticle() async {
-    if (widget.title != null) {
-      try {
-        final result = await RetriveData.sharedInstance.getArticle(widget.title!);
+    @override
+    void dispose() {
+      _titleController.dispose();
+      _abstractController.dispose();
+      _bodyController.dispose();
+      super.dispose();
+    }
+
+    void _loadArticle() async {
+      if (widget.title != null) {
+        try {
+          final result = await RetriveData.sharedInstance.getArticle(widget.title!);
+          if (mounted) {
+            setState(() {
+              if (result != null) {
+                article = result;
+                _titleController = FormUtils._initController(article?.title);
+                _abstractController = FormUtils._initController(article?.summary);
+                _bodyController = FormUtils._initController(article?.content);
+                selectedCategory = categories.firstWhereOrNull((c) => c.name == result.category);
+                selectedSubcategories = result.subcategory;
+              }
+              isLoading = false;
+            });
+          }
+        } catch (error) {
+          if (mounted) {
+            setState(() {
+              hasError = true;
+              isLoading = false;
+            });
+          }
+        }
+      } else {
         if (mounted) {
           setState(() {
-            if (result != null) {
-              article = result;
-              _titleController = FormUtils._initController(article?.title);
-              _abstractController = FormUtils._initController(article?.summary);
-              _bodyController = FormUtils._initController(article?.content);
-              selectedCategory = categories.firstWhereOrNull((c) => c.name == result.category);
-              selectedSubcategories = result.subcategory;
-            }
             isLoading = false;
+          });
+        }
+      }
+    }
+
+    void _loadCategories() async {
+      try {
+        final result = await RetriveData.sharedInstance.getCategories();
+        if (mounted && result != null) {
+          setState(() {
+            categories = result;
+            isLoadingCategory = false;
           });
         }
       } catch (error) {
         if (mounted) {
           setState(() {
-            hasError = true;
-            isLoading = false;
+            hasErrorCategory = true;
+            isLoadingCategory = false;
           });
         }
       }
-    } else {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
     }
-  }
 
-  void _loadCategories() async {
-    try {
-      final result = await RetriveData.sharedInstance.getCategories();
-      if (mounted && result != null) {
-        setState(() {
-          categories = result;
-          isLoadingCategory = false;
-        });
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          hasErrorCategory = true;
-          isLoadingCategory = false;
-        });
-      }
-    }
-  }
-
-
-  bool isSaving = false;
-
-  void save() async {
-    setState(() {
-      isSaving = true;
-    });
-
-    String _title = _titleController.document.toPlainText()
-    .replaceAll(RegExp(r'[^\w\s-]'), '')  // Rimuove tutto tranne lettere, numeri, spazi e trattini
-    .replaceAll(RegExp(r'\s+'), ' ')      // Riduce gli spazi consecutivi a uno solo
-    .trim();                             // Rimuove gli spazi all'inizio e alla fine
-    String _summary = jsonEncode(_abstractController.document.toDelta().toJson());
-    String _content = jsonEncode(_bodyController.document.toDelta().toJson());
-
-    print(_title);
-    print(selectedCategory);
-    print(selectedSubcategories);
-    
-    if (selectedCategory == null || selectedSubcategories.isEmpty) {
-      print("Categoria e sotto-categorie non valide.");
+    void save() async {
       setState(() {
-        isSaving = false;
+        isSaving = true;
       });
-      return;
+
+      String _title = _titleController.document.toPlainText()
+      .replaceAll(RegExp(r'[^\w\s-]'), '')  // Rimuove tutto tranne lettere, numeri, spazi e trattini
+      .replaceAll(RegExp(r'\s+'), ' ')      // Riduce gli spazi consecutivi a uno solo
+      .trim();                             // Rimuove gli spazi all'inizio e alla fine
+      String _summary = jsonEncode(_abstractController.document.toDelta().toJson());
+      String _content = jsonEncode(_bodyController.document.toDelta().toJson());
+
+      print(_title);
+      print(selectedCategory);
+      print(selectedSubcategories);
+      
+      if (selectedCategory == null || selectedSubcategories.isEmpty) {
+        setState(() {
+          isSaving = false;
+          Util.notify(context, "Seleziona una categoria ed almeno una sotto-categoria.", true);
+        });
+        return;
+      }
+
+      Article art = Article(
+        title: _title,
+        summary: _summary,
+        content: _content,
+        category: selectedCategory!.name,
+        subcategory: selectedSubcategories,
+        image: 'image',
+      );
+
+      if (imageFilename == null || imageBytes == null) {
+        setState(() {
+          isSaving = false;
+          Util.notify(context, "Seleziona un'immagine.", true);
+        });
+        return;
+      }
+
+      try {
+        await SendData.sharedInstance.save(art, imageBytes!, imageFilename!);
+        setState(() {
+          isSaving = false;
+        });
+        _showTheDialog(context, "Articolo salvato", "L'articolo è stato salvato ed è disponibile al pubblico.");
+      } catch (e) {
+        setState(() {
+          isSaving = false;
+          Util.notify(context, "L'articolo non è stato salvato con successo.", true);
+        });
+      }
     }
 
-    Article art = Article(
-      title: _title,
-      summary: _summary,
-      content: _content,
-      category: selectedCategory!.name,
-      subcategory: selectedSubcategories,
-      image: 'image',
-    );
-
-    if (imageFilename == null || imageBytes == null) {
-      print("Immagine non selezionata");
-      setState(() {
-        isSaving = false;
-      });
-      return;
-    }
-
-    try {
-      await SendData.sharedInstance.save(art, imageBytes!, imageFilename!);
-    } catch (e) {
-      print("Errore durante il salvataggio: $e");
-    }
-
-    setState(() {
-      isSaving = false;
-    });
-  }
-
-
-  void delete() async {
-    
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPage(
-      actions: [
-        Util.btn(
-          Icons.home,
-          'Home',
-          () => context.go('/'),
-        ),
-      ],
-      content: [
-        const SizedBox(height: 40.0),
-        if (isLoading)
-          Util.isLoading()
-        else if (hasError)
-          Util.error("Errore nel caricamento dell'articolo.")
-        else
-          ...[
-                ..._titleForm(),
-                const SizedBox(height: 30),
-                ..._abstractForm(),
-                const SizedBox(height: 30),
-                ..._bodyForm(),
-                const SizedBox(height: 30),
-                ..._buildImage(),
-                const SizedBox(height: 30),
-                ..._buildCategory(),
-                const SizedBox(height: 70),
-                ..._buildSaveAndDelete(),
+    void _showTheDialog(BuildContext context, String title, String content) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(content),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  context.go('/admin'); 
+                },
+                child: Text("Ok"),
+              ),
             ],
-        const SizedBox(height: 100),
-      ],
-    );
-  }
+          );
+        },
+      );
+    }
+
+    // Per update
+    void delete() async {
+      setState(() {
+        isDeleting = true;
+      });
+
+      String _title = _titleController.document.toPlainText()
+      .replaceAll(RegExp(r'[^\w\s-]'), '')  // Rimuove tutto tranne lettere, numeri, spazi e trattini
+      .replaceAll(RegExp(r'\s+'), ' ')      // Riduce gli spazi consecutivi a uno solo
+      .trim();                             // Rimuove gli spazi all'inizio e alla fine
+
+      try {
+        await SendData.sharedInstance.delete(_title);
+        setState(() {
+          isSaving = false;
+        });
+        _showTheDialog(context, "Articolo eliminato", "L'articolo è stato definitivamente elimininato.");
+      } catch (e) {
+        setState(() {
+          isDeleting = false;
+          Util.notify(context, "L'articolo non è stato eliminato correttamente.", true);
+        });
+      }
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return CustomPage(
+          actions: [
+            Util.btn(
+              Icons.home,
+              'Home',
+              () => context.go('/'),
+            ),
+          ],
+          content: [
+            const SizedBox(height: 40.0),
+            if (isLoading)
+              Util.isLoading()
+            else if (hasError)
+              Util.error("Errore nel caricamento dell'articolo.")
+            else
+              ...[
+                    ..._titleForm(),
+                    const SizedBox(height: 30),
+                    ..._abstractForm(),
+                    const SizedBox(height: 30),
+                    ..._bodyForm(),
+                    const SizedBox(height: 30),
+                    ..._buildImage(),
+                    const SizedBox(height: 30),
+                    ..._buildCategory(),
+                    const SizedBox(height: 70),
+                    ..._buildSaveAndDelete(),
+                ],
+            const SizedBox(height: 100),
+          ],
+      );
+    }
 
     List<Widget> _titleForm() {
         return [
