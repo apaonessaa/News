@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:newsweb/model/entity/article.dart';
 import 'package:newsweb/view/layout/image_viewer.dart';
+import 'package:newsweb/view/layout/quill_text_display.dart';
 
 ///  Display Article like this:
 ///  -----------------
@@ -14,7 +15,8 @@ import 'package:newsweb/view/layout/image_viewer.dart';
 ///  Summary
 ///  ----------------
 
-class OneArticle extends StatelessWidget {
+class OneArticle extends StatelessWidget 
+{
   final Article? article;
   final double width;
   final double height;
@@ -31,7 +33,8 @@ class OneArticle extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
     if (article == null) {
       return const SizedBox.shrink();
     }
@@ -53,23 +56,28 @@ class OneArticle extends StatelessWidget {
               top: 0.5, 
               bottom: 0.5
             ),
-            child: ImageViewer(title: article!.title)
+            child: SizedBox(
+              width: double.infinity,
+              height: height * imageCover,
+              child: ImageViewer(title: article!.title)
+            ),
           ),
           subtitle: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
                 article!.title,
-                maxLines: 2,
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.start,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontSize: 24,
+                textAlign: TextAlign.left,
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 5.0),
               if (withSummary) ...[
+                QuillTextDisplay(text: article!.summary),
+                /*
                 Text(
                   article!.summary,
                   maxLines: 2,
@@ -77,6 +85,7 @@ class OneArticle extends StatelessWidget {
                   textAlign: TextAlign.start,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
+                */
               ],
             ],
           ),

@@ -112,7 +112,7 @@ class _ArticlePage extends State<ArticlePage>
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                    const SizedBox(height: 10.0),
+                    const SizedBox(height: 40.0),
 
                     // Category
                     GestureDetector(
@@ -126,7 +126,7 @@ class _ArticlePage extends State<ArticlePage>
                         )
                     ),
 
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 15),
                     
                     // Article Image
                     Padding(
@@ -137,20 +137,14 @@ class _ArticlePage extends State<ArticlePage>
                     const SizedBox(height: 15),
                     Text(
                         art!.title,
-                        style: Theme.of(context).textTheme.titleLarge,
+                        style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.start,
                     ),
                 
-                    const SizedBox(height: 10),
-
+                    const SizedBox(height: 10), 
                     QuillTextDisplay(text: art!.summary),
-                    //Text(
-                    //    art!.summary,
-                    //    style: Theme.of(context).textTheme.bodyLarge,
-                    //    textAlign: TextAlign.start,
-                    //),
-                    const SizedBox(height: 10),
-                    const Divider(),
                     const SizedBox(height: 10),
 
                     // Subcategory
@@ -177,16 +171,13 @@ class _ArticlePage extends State<ArticlePage>
                                 );
                             })
                         ]
-                    ),
+                    ),    
                     const SizedBox(height: 20),
-                    QuillTextDisplay(text: art!.content),
-                    //Text(
-                    //    art!.content,
-                    //    style: Theme.of(context).textTheme.bodyMedium,
-                    //    textAlign: TextAlign.start,
-                    //),     
+                    const Divider(),
+                    const SizedBox(height: 10),
+                    QuillTextDisplay(text: art!.content),    
                 ],
             ),
         ];
-  }
+    }
 }

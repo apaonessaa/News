@@ -25,8 +25,8 @@ import 'package:newsweb/view/layout/image_viewer.dart';
 class ListOfArticles extends StatelessWidget {
   final List<Article>? articles;
   final bool withImage;
-  final double? width;
-  final double? height;
+  final double width;
+  final double height;
 
   const ListOfArticles({
     super.key,
@@ -58,18 +58,20 @@ class ListOfArticles extends StatelessWidget {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                     onTap: () => context.go('/article/${articles![index].title}'),
                     leading: withImage
-                        ? ImageViewer(title: articles![index].title)
+                        ? SizedBox(
+                            width: 75,
+                            height: 75,
+                            child: ImageViewer(title: articles![index].title)
+                          )
                         : null,
                     title: Text(
                       articles![index].title,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Theme.of(context).colorScheme.onSecondary,
-                        fontWeight: FontWeight.w100
-                      ),  
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.w100,
+                      ),
                     ),
                   ),
                 ],

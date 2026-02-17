@@ -34,3 +34,5 @@ build/
 
 ### DSSTORE ###
 .DS_Store
+
+NewsAPI/APItest/**

@@ -10,7 +10,7 @@ import 'package:newsweb/view/article_page.dart';
 import 'package:newsweb/view/category_page.dart';
 import 'package:newsweb/view/subcategory_page.dart';
 import 'package:newsweb/view/admin_page.dart';
-import 'package:newsweb/view/article_form_page.dart';
+import 'package:newsweb/view/form/article_form_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
@@ -69,14 +69,14 @@ class _App extends State<App> {
               },
             ),
             GoRoute(
-              path: '/admin/article/:title/update',
+              path: '/admin/article/:title',
               builder: (BuildContext context, GoRouterState state) {
                 final title = state.pathParameters['title']!;
-                return ArticleFormPage(title: title);
+                return ArticleFormPage();
               },
             ),
             GoRoute(
-              path: '/admin/article/create',
+              path: '/admin/article',
               builder: (BuildContext context, GoRouterState state) {
                 return ArticleFormPage();
               },

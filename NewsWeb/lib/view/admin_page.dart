@@ -110,7 +110,7 @@ class _AdminPage extends State<AdminPage>
                     width: 120,
                     height: 35,
                     child: ElevatedButton(
-                        onPressed: () => context.go('/admin/article/create'),
+                        onPressed: () => context.go('/admin/article'),
                         style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.zero,
                             textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
@@ -243,7 +243,7 @@ class ListOfArticlesToModify extends StatelessWidget {
                   if (index > 0) Divider(),
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                    onTap: () => context.go('/admin/article/${articles![index].title}/update'),
+                    onTap: () => context.go('/admin/article/${articles![index].title}'),
                     leading: ImageViewer(title: articles![index].title),
                     title: Text(
                         articles![index].title,

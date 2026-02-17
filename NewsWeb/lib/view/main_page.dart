@@ -133,9 +133,9 @@ class _MainPage extends State<MainPage>
           widgets: [
             OneArticle(
               article: page.removeAt(0),
-              imageCover: 0.56,
+              imageCover: 0.65,
               height: 502,
-              withSummary: true,
+              withSummary: false,
             ),
             if (page.isNotEmpty)
               StackOfArticles(
@@ -153,7 +153,7 @@ class _MainPage extends State<MainPage>
         Layer(widgets: [
           StackOfArticles(
             articles: Util.getAndRemove<Article>(page, 3),
-            withImage: false,
+            withImage: true,
             height: 502,
             imageCover: 0.5,
           ),

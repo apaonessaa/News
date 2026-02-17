@@ -30,12 +30,13 @@ import 'package:newsweb/view/layout/image_viewer.dart';
 ///  title3
 ///  ----------------
 
-class StackOfArticles extends StatelessWidget {
+class StackOfArticles extends StatelessWidget 
+{
   final List<Article>? articles;
   final bool withImage;
-  final double? width;
-  final double? height;
-  final double? imageCover; // double in (0.0 , 1.0)
+  final double width;
+  final double height;
+  final double imageCover; // double in (0.0 , 1.0)
 
   const StackOfArticles({
     this.articles,
@@ -47,7 +48,8 @@ class StackOfArticles extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
     if (articles == null) {
       return const SizedBox.shrink();
     }
@@ -78,17 +80,18 @@ class StackOfArticles extends StatelessWidget {
                       top: 0.5,
                       bottom: 10.0,
                     ),
-                    child: ImageViewer(title: article.title!)
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: height * imageCover,
+                      child: ImageViewer(title: article.title)
+                    ),                    
                   ),
                   subtitle: Text(
                     article.title,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Theme.of(context).colorScheme.onSecondary,
-                      height: 1.5,
+                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -104,16 +107,18 @@ class StackOfArticles extends StatelessWidget {
                           horizontal: 10.0, vertical: 5.0),
                       onTap: () => context.go('/article/${article!.title}'),
                       leading: withImage
-                          ? ImageViewer(title: article!.title!)
+                          ? SizedBox(
+                              width: 75,
+                              height: 75,
+                              child: ImageViewer(title: article.title)
+                            )
                           : null,
                       title: Text(
                         article.title,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                         textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.onSecondary,
+                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
                           fontWeight: FontWeight.w100,
                         ),
                       ),

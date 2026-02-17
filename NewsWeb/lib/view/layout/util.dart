@@ -40,8 +40,13 @@ class Util
     }
 
     static Widget isLoading() {
-        return const Center(
-          child: CircularProgressIndicator(),
+        return const Column(
+          children: [
+            const SizedBox(height: 40),
+            Center(
+              child: CircularProgressIndicator(color: Colors.red),
+            )
+          ]
         );
     }
 
