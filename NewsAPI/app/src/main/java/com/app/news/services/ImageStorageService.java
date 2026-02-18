@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.InvalidMimeTypeException;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,19 +21,19 @@ import java.util.UUID;
 @Service
 public class ImageStorageService implements IFImageStorage<String, byte[]>
 {
-
     private final FileValidator imgvald;
 
-    //@Value("${pathto.images:default=.}")
     private final Path root;
 
-    public ImageStorageService()
+    public ImageStorageService(
+            @Value("${IMAGE_STORAGE_PATH:/home/spring/images}") String rootPath
+    )
     {
         MediaType[] validContentType = {
                 MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG
         };
         this.imgvald = new FileValidator(Arrays.asList(validContentType));
-        this.root = Path.of(new File(".").getAbsolutePath());
+        this.root = Path.of(rootPath);
     }
 
     private String getSecureFilename(@NotNull @NotBlank String filename)

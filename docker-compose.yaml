@@ -1,6 +1,6 @@
 services:
   news-api:
-    build: .
+    build: NewsAPI
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://news-db:3306/newsdb
       - SPRING_DATASOURCE_USERNAME=root
