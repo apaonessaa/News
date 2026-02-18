@@ -96,11 +96,8 @@ class FormUtils
         );
     }
 
-    static quill.QuillController _initController(String? value) 
+    static quill.QuillController initQuillController(String value) 
     {
-        if (value == null || value.isEmpty) {
-            return quill.QuillController.basic();
-        }
         try {
             final decoded = jsonDecode(value);
             return quill.QuillController(

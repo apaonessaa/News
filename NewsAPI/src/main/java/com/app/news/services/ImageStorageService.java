@@ -39,7 +39,9 @@ public class ImageStorageService implements IFImageStorage<String, byte[]>
 
     private String getSecureFilename(@NotNull @NotBlank String filename)
     {
-        return UUID.randomUUID() + "_" + filename;
+        int firstDot = filename.indexOf(".");
+        String noExtFilename = filename.substring(0, firstDot);
+        return UUID.randomUUID() + "_" + noExtFilename;
     }
 
     @Override

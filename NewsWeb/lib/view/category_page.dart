@@ -33,7 +33,7 @@ class _CategoryPage extends State<CategoryPage>
 
   List<Article> page = [];
   int pageNumber = 0;
-  int pageSize = 13;
+  int pageSize = 9;
   int maxPageNumber = 0;
 
   @override
@@ -118,7 +118,10 @@ class _CategoryPage extends State<CategoryPage>
           Util.btn(
             Icons.webhook,
             'Home',
-            () => context.go('/'),
+            () {
+              Navigator.of(context).pop();
+              context.go('/');
+            },
           ),
         ],
         content: [Util.isLoading()],
@@ -131,7 +134,10 @@ class _CategoryPage extends State<CategoryPage>
           Util.btn(
             Icons.webhook,
             'Home',
-            () => context.go('/'),
+            () {
+              Navigator.of(context).pop();
+              context.go('/');
+            },
           ),
         ],
         content: [
@@ -151,11 +157,20 @@ class _CategoryPage extends State<CategoryPage>
         Util.btn(
           Icons.webhook,
           'Home',
-          () => context.go('/'),
+          () {
+            Navigator.of(context).pop();
+            context.go('/');
+          },
         ),
       ],
       content: [
-        UtilsLayout.layout(_build(context), maxWidth),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            UtilsLayout.layout(_build(context), maxWidth),
+          ]
+        ),
         const SizedBox(height: 100),
         const SizedBox.shrink(),
         const CatAndSubcatFooter(),
@@ -181,8 +196,11 @@ class _CategoryPage extends State<CategoryPage>
         const SizedBox(height: 40.0),
 
         Text(
-          widget.categoryName,
-          style: Theme.of(context).textTheme.displayMedium,
+          category.name,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+          ),
           textAlign: TextAlign.start,
         ),
 
@@ -196,44 +214,24 @@ class _CategoryPage extends State<CategoryPage>
 
         const SizedBox(height: 40.0),
 
-      // LAYER #1: Primo articolo in cima
+      // LAYER
       if (page.isNotEmpty)
         Layer(
           widgets: [
-            OneArticle(
-              article: page.removeAt(0),
-              imageCover: 0.65,
+            StackOfArticles(
+              articles: Util.getAndRemove<Article>(page, 3),
+              withImage: false,
               height: 502,
-              withSummary: true,
+              imageCover: 0.70,
             ),
             if (page.isNotEmpty)
-              StackOfArticles(
-                articles: Util.getAndRemove<Article>(page, 3),
+              ListOfArticles(
+                articles: Util.getAndRemove<Article>(page, 6),
                 withImage: true,
-                imageCover: 0.50,
                 height: 502,
               ),
           ],
         ),
-
-      // LAYER #2: Altri articoli con layout alternato
-      if (page.isNotEmpty) ...[
-        const SizedBox(height: 50.0),
-        Layer(widgets: [
-          StackOfArticles(
-            articles: Util.getAndRemove<Article>(page, 3),
-            withImage: false,
-            height: 502,
-            imageCover: 0.5,
-          ),
-          if (page.isNotEmpty)
-            ListOfArticles(
-              articles: Util.getAndRemove<Article>(page, 6),
-              withImage: true,
-              height: 502,
-            ),
-        ])
-      ],
         
         // Paginazione
         const SizedBox(height: 20.0),

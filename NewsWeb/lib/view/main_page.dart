@@ -69,7 +69,10 @@ class _MainPage extends State<MainPage>
           Util.btn(
             Icons.webhook,
             'Home',
-            () => context.go('/'),
+            () {
+              //Navigator.of(context).pop();
+              context.go('/');
+            },
           ),
         ],
         content: [Util.isLoading()],
@@ -82,7 +85,10 @@ class _MainPage extends State<MainPage>
           Util.btn(
             Icons.webhook,
             'Home',
-            () => context.go('/'),
+            () {
+              //Navigator.of(context).pop();
+              context.go('/');
+            },
           ),
         ],
         content: [
@@ -102,12 +108,18 @@ class _MainPage extends State<MainPage>
         Util.btn(
           Icons.webhook,
           'Home',
-          () => context.go('/'),
+          () {
+            //Navigator.of(context).pop();
+            context.go('/');
+          },
         ),
         Util.btn(
             Icons.webhook,
             'Admin',
-            () => context.go('/admin'),
+            () {
+              Navigator.of(context).pop();
+              context.go('/admin');
+            },
           ),
       ],
       content: [

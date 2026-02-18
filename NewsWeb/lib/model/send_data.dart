@@ -54,9 +54,63 @@ class SendData
                 print("Errore nel salvataggio dell'articolo: ${response.statusCode}");
                 var responseBody = await response.stream.bytesToString();
                 print("Risposta dell'errore: $responseBody");
+                throw new Exception();
             }
         } catch (e) {
             print("Errore durante la richiesta HTTP: $e");
+            throw new Exception();
+        }
+    }
+
+    Future<void> update(
+    Article art, 
+    Uint8List? imageBytes, 
+    String imageFilename) async 
+    {
+        final mimeType = lookupMimeType(imageFilename);
+        String subType = mimeType?.split('/').last ?? 'unknown';
+
+        var articleJson = art.toJson();
+
+        var request = http.MultipartRequest(
+            'PUT',
+            Uri.parse('${Endpoints.REMOTE_API}${Endpoints.article(art.title)}')
+        )
+        ..files.add(
+            http.MultipartFile.fromBytes(
+                'article',
+                utf8.encode(jsonEncode(articleJson)),
+                filename: 'article.json', 
+                contentType: MediaType('application', 'json'),
+            ),
+        );
+
+        if (imageBytes != null && imageBytes.isNotEmpty) {
+            request.files.add(
+                http.MultipartFile.fromBytes(
+                    'image',
+                    imageBytes,
+                    filename: imageFilename,
+                    contentType: MediaType('image', subType),
+                ),
+            );
+        }
+
+        print(request.headers);
+
+        try {
+            var response = await request.send();
+            if (response.statusCode == 200) {
+                print("Articolo è stato aggiornato con successo!");
+            } else {
+                print("Errore nel salvataggio dell'articolo: ${response.statusCode}");
+                var responseBody = await response.stream.bytesToString();
+                print("Risposta dell'errore: $responseBody");
+                throw new Exception();
+            }
+        } catch (e) {
+            print("Errore durante la richiesta HTTP: $e");
+            throw new Exception();
         }
     }
 

@@ -14,26 +14,31 @@ import 'package:newsweb/view/layout/util.dart';
 import 'package:newsweb/view/layout/article_page/layer.dart';
 import 'package:newsweb/view/form/form_utils.dart';
 
-class ArticleFormPage extends StatefulWidget
+class ArticleUpdatePage extends StatefulWidget
 {
-    const ArticleFormPage({super.key});
+    final String title;
+    const ArticleUpdatePage({super.key, required this.title});
+
     @override 
-    _ArticleFormPage createState() => _ArticleFormPage();
+    _ArticleUpdatePage createState() => _ArticleUpdatePage();
 }
 
-class _ArticleFormPage extends State<ArticleFormPage> 
-{    
+class _ArticleUpdatePage extends State<ArticleUpdatePage> 
+{
+    bool isLoading = true;
+    bool hasError = false;
+
     List<Category> categories = [];
     bool isLoadingCategory = true;
     bool hasErrorCategory = false;
 
-    late quill.QuillController _titleController;
     late quill.QuillController _abstractController;
     late quill.QuillController _bodyController;
 
     FilePickerResult? pickedFile;
     Uint8List? imageBytes;
     String? imageFilename;
+    bool hasNewImage = false;
     bool isLoadingImageUploaded = true;
     bool hasErrorImageUploaded = false;
 
@@ -41,24 +46,60 @@ class _ArticleFormPage extends State<ArticleFormPage>
     Set<String> selectedSubcategories = {};
 
     bool isSaving = false;
+    bool isDeleting = false;
 
     @override
     void initState() 
     {
         super.initState();
-        _titleController = quill.QuillController.basic();
         _abstractController = quill.QuillController.basic(); 
         _bodyController = quill.QuillController.basic(); 
         _loadCategories();
+        _loadArticle();
     }
 
     @override
     void dispose() 
     {
-        _titleController.dispose();
         _abstractController.dispose();
         _bodyController.dispose();
         super.dispose();
+    }
+
+    void _loadArticle() async 
+    {
+        setState(() {
+            isLoading = true;
+            hasError = false;
+        });
+
+        try {
+            final result = await RetriveData.sharedInstance.getArticle(widget.title!);
+            setState(() {
+                if (result != null) {
+                    _abstractController = FormUtils.initQuillController(result.summary);
+                    _bodyController = FormUtils.initQuillController(result.content);
+                    selectedCategory = categories.firstWhereOrNull((c) => c.name == result.category);
+                    selectedSubcategories = result.subcategory.toSet();
+                    imageFilename = result.image;
+                }
+            });
+            final image = await RetriveData.sharedInstance.getImage(widget.title!);
+            setState(() {
+                if(image!=null) {
+                    imageBytes = image;
+                }
+            });
+        } catch (error) {
+            setState(() {
+                hasError = true;
+                Util.notify(context, "Errore con il caricamento dell'articolo.", true);
+            });
+        }
+
+        setState(() {
+            isLoading = false;
+        });
     }
 
     void _loadCategories() async 
@@ -95,10 +136,6 @@ class _ArticleFormPage extends State<ArticleFormPage>
           isSaving = true;
         });
 
-        String _title = _titleController.document.toPlainText()
-            .replaceAll(RegExp(r'[^\w\s-]'), '')  // Rimuove tutto tranne lettere, numeri, spazi e trattini
-            .replaceAll(RegExp(r'\s+'), ' ')      // Riduce gli spazi consecutivi a uno solo
-            .trim();                             // Rimuove gli spazi all'inizio e alla fine
         String _summary = jsonEncode(_abstractController.document.toDelta().toJson());
         String _content = jsonEncode(_bodyController.document.toDelta().toJson());
         if (selectedCategory == null || selectedSubcategories.isEmpty) {
@@ -110,31 +147,23 @@ class _ArticleFormPage extends State<ArticleFormPage>
         }
 
         Article art = Article(
-            title: _title,
+            title: widget.title,
             summary: _summary,
             content: _content,
             category: selectedCategory!.name,
             subcategory: selectedSubcategories.toList(),
-            image: 'image',
+            image: imageFilename!,
         );
 
-        if (imageFilename == null || imageBytes == null) {
-            setState(() {
-                isSaving = false;
-                Util.notify(context, "Seleziona un'immagine.", true);
-            });
-            return;
-        }
-
         try {
-            await SendData.sharedInstance.save(art, imageBytes!, imageFilename!);
+            await SendData.sharedInstance.update(art, hasNewImage ? imageBytes! : null, imageFilename!);
             setState(() {
                 isSaving = false;
             });
             FormUtils.gotoAdminDialog(
                 context, 
-                "Articolo salvato", 
-                "L'articolo è stato salvato ed è disponibile al pubblico.",
+                "Articolo aggiornato", 
+                "L'articolo è stato aggiornato ed è disponibile al pubblico.",
                 [
                     TextButton(
                         onPressed: () {
@@ -148,7 +177,40 @@ class _ArticleFormPage extends State<ArticleFormPage>
         } catch (e) {
             setState(() {
                 isSaving = false;
-                Util.notify(context, "L'articolo non è stato salvato con successo.", true);
+                Util.notify(context, "L'articolo non è stato aggiornato con successo.", true);
+            });
+        }
+    }
+
+    void delete() async 
+    {
+        setState(() {
+            isDeleting = true;
+        });
+
+        try {
+            await SendData.sharedInstance.delete(widget.title);
+            setState(() {
+                isSaving = false;
+            });
+            FormUtils.gotoAdminDialog(
+                context, 
+                "Articolo eliminato", 
+                "L'articolo è stato eliminato con successo.",
+                [
+                    TextButton(
+                        onPressed: () {
+                            Navigator.of(context).pop();
+                            context.go('/admin'); 
+                        },
+                        child: Text("Ok"),
+                    )
+                ]
+            );
+        } catch (e) {
+            setState(() {
+                isDeleting = false;
+                Util.notify(context, "Errore con l'eliminazione dell'articolo.", true);
             });
         }
     }
@@ -169,7 +231,8 @@ class _ArticleFormPage extends State<ArticleFormPage>
                 setState(() {
                     final file = pickedFile!.files.first;
                     imageBytes = file.bytes;
-                    imageFilename = file.name;
+                    //imageFilename = file.name;
+                    hasNewImage = true;
                     Util.notify(context, "L'immagine è stata caricata con successo!", false);
                 });
             } else {
@@ -201,13 +264,15 @@ class _ArticleFormPage extends State<ArticleFormPage>
                     () {
                         Navigator.of(context).pop();
                         context.go('/');
-                    },
+                    }
                 ),
             ],
             content: [
                 const SizedBox(height: 40.0),
-                if (isLoadingCategory || isSaving)
+                if (isLoadingCategory || isSaving || isDeleting)
                     Util.isLoading()
+                else if (hasError)
+                    Util.error('Errore con l\'aggiornamento dell\'articolo.')
                 else
                     ...[
                         ..._titleForm(),
@@ -220,7 +285,7 @@ class _ArticleFormPage extends State<ArticleFormPage>
                         const SizedBox(height: 30),
                         ..._buildCategory(),
                         const SizedBox(height: 70),
-                        ..._buildSave(),
+                        ..._buildSaveAndDelete(),
                     ],
                 const SizedBox(height: 100),
             ],
@@ -235,27 +300,15 @@ class _ArticleFormPage extends State<ArticleFormPage>
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8.0),
-            Container(
-                constraints: const BoxConstraints(minHeight: 100),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
-                    color: Colors.white,
+            Text(
+                widget.title,
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
                 ),
-                child: quill.QuillEditor.basic(
-                    controller: _titleController,
-                    config: const quill.QuillEditorConfig(
-                        placeholder: "Inserisci il titolo...",
-                        scrollable: false,
-                        expands: false,
-                        padding: EdgeInsets.zero,
-                        autoFocus: false,
-                    ),
-                ),
+                textAlign: TextAlign.start,
             ),
         ];
-    }    
+    }
 
     List<Widget> _abstractForm() 
     {
@@ -540,7 +593,7 @@ class _ArticleFormPage extends State<ArticleFormPage>
         ];
     }
 
-    List<Widget> _buildSave() 
+    List<Widget> _buildSaveAndDelete() 
     {
         return [
             Row(
@@ -556,6 +609,21 @@ class _ArticleFormPage extends State<ArticleFormPage>
                                 textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                             child: const Text('Salva'),
+                        ),
+                    ),
+                    const SizedBox(width: 30),
+                    SizedBox(
+                        width: 120,
+                        height: 35,
+                        child: ElevatedButton(
+                            onPressed: delete,
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.zero,
+                                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                            child: const Text('Elimina'),
                         ),
                     ),
                 ],

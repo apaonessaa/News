@@ -80,14 +80,18 @@ class _AdminPage extends State<AdminPage>
     }
 
     @override
-    Widget build(BuildContext context) {
+    Widget build(BuildContext context) 
+    {
         double maxWidth = UtilsLayout.setWidth(context);
         return CustomPage(
             actions: [
                 Util.btn(
                     Icons.webhook,
                     'Home',
-                    () => context.go('/'),
+                    () {
+                        Navigator.of(context).pop();
+                        context.go('/');
+                    }
                 ),
             ],
             content: [
@@ -110,7 +114,10 @@ class _AdminPage extends State<AdminPage>
                     width: 120,
                     height: 35,
                     child: ElevatedButton(
-                        onPressed: () => context.go('/admin/article'),
+                        onPressed: () {
+                            Navigator.of(context).pop();
+                            context.go('/admin/article');
+                        },
                         style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.zero,
                             textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
@@ -211,7 +218,8 @@ class _AdminPage extends State<AdminPage>
     }
 }
 
-class ListOfArticlesToModify extends StatelessWidget {
+class ListOfArticlesToModify extends StatelessWidget 
+{
   final List<Article>? articles;
   final double? width;
   final double? height;
@@ -243,8 +251,15 @@ class ListOfArticlesToModify extends StatelessWidget {
                   if (index > 0) Divider(),
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                    onTap: () => context.go('/admin/article/${articles![index].title}'),
-                    leading: ImageViewer(title: articles![index].title),
+                    onTap: () {
+                        Navigator.of(context).pop();
+                        context.go('/admin/article/${articles![index].title}');
+                    },
+                    leading: SizedBox(
+                        width: 75,
+                        height: 75,
+                        child: ImageViewer(title: articles![index].title)
+                    ),
                     title: Text(
                         articles![index].title,
                         overflow: TextOverflow.ellipsis,

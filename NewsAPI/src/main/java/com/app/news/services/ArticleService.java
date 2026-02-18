@@ -139,10 +139,11 @@ public class ArticleService implements IService<Article, String>
         /**
          * Update the subcategory (least one subcategory)
          */
-        Set<SubCategory> toRemove = art.getSubcats();
+        Set<SubCategory> toRemove = new HashSet<>(art.getSubcats());
         Set<SubCategory> toAdd = new HashSet<>();
+        Set<String> scnames = e.getSubcats().stream().map(SubCategory::getName).collect(Collectors.toSet());
         SubCategory sc;
-        for (String scname : e.getSubcats().stream().map(SubCategory::getName).toList()) {
+        for (String scname : scnames) {
             try {
                 sc = catserv.getSubCat(catname, scname);
                 if (sc.getCategory().equals(cat) && !toRemove.remove(sc))
@@ -155,11 +156,11 @@ public class ArticleService implements IService<Article, String>
          * Least one subcategory
          *      (subcategories - toRemove) U toAdd
          * */
-        Set<SubCategory> leastOne = art.getSubcats();
+        Set<SubCategory> leastOne = new HashSet<>(art.getSubcats());
         leastOne.removeAll(toRemove);
         leastOne.addAll(toAdd);
         if (leastOne.isEmpty())
-            throw new CreateException("The article <"+title+"> has no subcategory of <"+catname+"> category.");
+            throw new UpdateException("The article <"+title+"> has no subcategory of <"+catname+"> category.");
 
         for (SubCategory subcat : toRemove) {
             subcat.removeArticle(art);

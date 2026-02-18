@@ -61,7 +61,10 @@ class _ArticlePage extends State<ArticlePage>
                     Util.btn(
                         Icons.webhook,
                         'Home',
-                        () => context.go('/'),
+                        () {
+                            Navigator.of(context).pop();
+                            context.go('/'); 
+                        },
                     ),
                 ],
                 content: [Util.isLoading()],
@@ -74,7 +77,10 @@ class _ArticlePage extends State<ArticlePage>
                     Util.btn(
                         Icons.webhook,
                         'Home',
-                        () => context.go('/'),
+                        () {
+                            Navigator.of(context).pop();
+                            context.go('/');
+                        },
                     ),
                 ],
                 content: [
@@ -94,7 +100,10 @@ class _ArticlePage extends State<ArticlePage>
                 Util.btn(
                     Icons.webhook,
                     'Home',
-                    () => context.go('/'),
+                    () {
+                        Navigator.of(context).pop();
+                        context.go('/');
+                    },
                 ),
             ],
             content: [
@@ -116,7 +125,10 @@ class _ArticlePage extends State<ArticlePage>
 
                     // Category
                     GestureDetector(
-                        onTap: () => context.go('/category/${art!.category}'),
+                        onTap: () {
+                            Navigator.of(context).pop();
+                            context.go('/category/${art!.category}');
+                        },
                         child: Text(
                             art!.category,
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -143,9 +155,9 @@ class _ArticlePage extends State<ArticlePage>
                         textAlign: TextAlign.start,
                     ),
                 
-                    const SizedBox(height: 10), 
+                    const SizedBox(height: 15), 
                     QuillTextDisplay(text: art!.summary),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 15),
 
                     // Subcategory
                     Row(
@@ -158,7 +170,10 @@ class _ArticlePage extends State<ArticlePage>
                                         style: TextButton.styleFrom(
                                             backgroundColor: Colors.red,
                                         ),
-                                        onPressed: () => context.go('/category/${art!.category}/subcategory/${subcat}'),
+                                        onPressed: () {
+                                            Navigator.of(context).pop();
+                                            context.go('/category/${art!.category}/subcategory/${subcat}');
+                                        },
                                         child: Text(
                                             subcat,
                                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -174,7 +189,7 @@ class _ArticlePage extends State<ArticlePage>
                     ),    
                     const SizedBox(height: 20),
                     const Divider(),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     QuillTextDisplay(text: art!.content),    
                 ],
             ),

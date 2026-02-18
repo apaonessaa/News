@@ -56,7 +56,10 @@ class ListOfArticles extends StatelessWidget {
                   if (index > 0) Divider(),
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                    onTap: () => context.go('/article/${articles![index].title}'),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.go('/article/${articles![index].title}');
+                    },
                     leading: withImage
                         ? SizedBox(
                             width: 75,

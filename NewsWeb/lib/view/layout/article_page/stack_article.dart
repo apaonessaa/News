@@ -72,7 +72,10 @@ class StackOfArticles extends StatelessWidget
               if (index == 0) {
                 // For the first article, show image above the title
                 return ListTile(
-                  onTap: () => context.go('/article/${article!.title}'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.go('/article/${article!.title}');
+                  },
                   title: Padding(
                     padding: const EdgeInsets.only(
                       left: 0.5,
@@ -105,7 +108,10 @@ class StackOfArticles extends StatelessWidget
                     ListTile(
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 10.0, vertical: 5.0),
-                      onTap: () => context.go('/article/${article!.title}'),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        context.go('/article/${article!.title}');
+                      },
                       leading: withImage
                           ? SizedBox(
                               width: 75,

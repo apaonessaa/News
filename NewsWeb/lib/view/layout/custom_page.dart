@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:newsweb/view/layout/util.dart';
-import 'package:newsweb/view/theme/theme.dart';
-import 'package:newsweb/view/layout/category_drawer.dart';
 
 class CustomPage extends StatefulWidget {
   final List<Widget> actions;
@@ -22,12 +19,7 @@ class _CustomPage extends State<CustomPage>
         backgroundColor: Colors.red,
         automaticallyImplyLeading: false,
         actions: widget.actions,
-        //leading: IconButton(
-        //  icon: Icon(Icons.menu),
-        //  onPressed: () {
-        //    NavigationService.scaffoldKey.currentState?.openDrawer();
-        //  },
-        ),
+      ),
       body: Stack(
         children: [
           ListView(
@@ -38,20 +30,6 @@ class _CustomPage extends State<CustomPage>
             ],
           ),
         ],
-      ),
-      //drawer: _buildCustomDrawer(),
-    );
-  }
-
-  Widget _buildCustomDrawer() {
-    return Drawer(
-      elevation: 16,
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          color: Colors.white.withOpacity(0.9),
-          child: CategoryDrawer(),
-        ),
       ),
     );
   }

@@ -11,10 +11,11 @@ import 'package:newsweb/view/category_page.dart';
 import 'package:newsweb/view/subcategory_page.dart';
 import 'package:newsweb/view/admin_page.dart';
 import 'package:newsweb/view/form/article_form_page.dart';
+import 'package:newsweb/view/form/article_update_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
-  setUrlStrategy(PathUrlStrategy());
+  //setUrlStrategy(PathUrlStrategy());
   runApp(App());
 }
 
@@ -69,16 +70,16 @@ class _App extends State<App> {
               },
             ),
             GoRoute(
-              path: '/admin/article/:title',
+              path: '/admin/article',
               builder: (BuildContext context, GoRouterState state) {
-                final title = state.pathParameters['title']!;
                 return ArticleFormPage();
               },
             ),
             GoRoute(
-              path: '/admin/article',
+              path: '/admin/article/:title',
               builder: (BuildContext context, GoRouterState state) {
-                return ArticleFormPage();
+                final title = state.pathParameters['title']!;
+                return ArticleUpdatePage(title: title);
               },
             ),
           ],

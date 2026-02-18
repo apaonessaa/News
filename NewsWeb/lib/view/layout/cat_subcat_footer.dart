@@ -91,7 +91,10 @@ class ListOfCategoryAndSubcategory extends StatelessWidget
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextButton(
-            onPressed: () => context.go('/category/${category.name}'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              context.go('/category/${category.name}');
+            },
             child: Text(
               category.name,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -110,13 +113,15 @@ class ListOfCategoryAndSubcategory extends StatelessWidget
                   runSpacing: 4.0,
                   children: category.subcategory.map((subcat) {
                     return TextButton(
-                      onPressed: () => context.go('/category/${category.name}/subcategory/${subcat}'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        context.go('/category/${category.name}/subcategory/${subcat}');
+                      },
                       child: Text(
                         subcat,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
                       ),
                     );

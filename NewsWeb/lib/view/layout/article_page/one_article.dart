@@ -48,7 +48,10 @@ class OneArticle extends StatelessWidget
           borderRadius: BorderRadius.zero,
         ),
         child: ListTile(
-          onTap: () => context.go('/article/${article!.title}'),
+          onTap: () { 
+            Navigator.of(context).pop();
+            context.go('/article/${article!.title}'); 
+          },
           title: Padding(
             padding: const EdgeInsets.only(
               left: 0.5, 
