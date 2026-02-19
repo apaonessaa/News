@@ -5,13 +5,20 @@ ARG HF_TOKEN
 ARG HF_MODEL
 ARG HF_API
 
-WORKDIR /app
+# Create a group and non-root user
+RUN addgroup --gid 1234 flask && adduser --gid 1234 --uid 1234 --home /home/flask --disabled-password flask
+RUN mkdir -p /home/flask && chown -R flask:flask /home/flask
 
+# Change user
+USER flask:flask
+WORKDIR /home/flask
+
+# Copy files, active virtual env and download dependencies
 COPY requirements.txt .
 COPY main.py .
 
 RUN python3 -m venv .venv
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/home/flask/.venv/bin:$PATH"
 
 RUN pip install -r requirements.txt
 
