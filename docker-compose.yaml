@@ -49,6 +49,13 @@ services:
     ports:
       - 8083:8000
 
+  summarizer:
+    build: NewsAI/Summarizer
+    environment:
+      - HF_MODEL=${SUMMARIZER_MODEL}
+    ports:
+      - 8084:8000
+
 volumes:
   persist-db:
   persist-server:

@@ -42,6 +42,8 @@ class _ArticleFormPage extends State<ArticleFormPage>
 
     bool isSaving = false;
     bool isLoadingSummary = false;
+    bool isLoadingBody = false;
+    bool isLoadingSelectedCategory = false;
 
     @override
     void initState() 
@@ -191,27 +193,67 @@ class _ArticleFormPage extends State<ArticleFormPage>
         }
     }
 
-    void corrector() async
+    void corrector(quill.QuillController controller) async
     {
-        setState(() {
-            isLoadingSummary=true;
-        });
+        final selection = controller.selection;
+        final textToCorrect = controller.document.getPlainText(selection.start, selection.end);
 
-        final text = _abstractController.document.toPlainText().trim();
-        try {
-            final result = await RetriveData.sharedInstance.corrector(text);
-            print(result);
+        if (textToCorrect.isEmpty) {
             setState(() {
-                Util.notify(context, "Il testo è stato corretto.", false);
+                Util.notify(context, "Seleziona il testo da correggere.", true);
             });
-        } catch (e) {
-            setState(() {
-                Util.notify(context, "Errore nella correzione del testo.", true);
-            });
+        } else {
+            try {
+                final result = await RetriveData.sharedInstance.corrector(textToCorrect);
+
+                controller.replaceText(selection.start, selection.end - selection.start, result, null);
+                
+                setState(() {
+                    Util.notify(context, "Il testo è stato corretto.", false);
+                });
+            } catch (e) {
+                setState(() {
+                    Util.notify(context, "Errore nella correzione del testo.", true);
+                });
+            }
         }
-        setState(() {
-            isLoadingSummary=false;
-        });
+    }
+
+    void classifier(quill.QuillController controller) async
+    {
+        List<String> labels = [];
+
+        if (selectedCategory==null) {
+            labels = categories.map((category) { return category.name; }).toList();
+        } else {
+            labels = selectedCategory!.subcategory;
+        }
+
+        final selection = controller.selection;
+        final textToClassify = controller.document.getPlainText(selection.start, selection.end);
+
+        if (textToClassify.isEmpty) {
+            setState(() {
+                Util.notify(context, "Seleziona il testo da classificare.", true);
+            });
+        } else {
+            try {
+                final result = await RetriveData.sharedInstance.classifier(textToClassify, labels);
+                if (selectedCategory==null) {
+                    selectedCategory = categories.firstWhereOrNull((c) => c.name == result[0]);
+                } else {
+                    selectedSubcategories = result.toSet();
+                }
+                
+                setState(() {
+                    Util.notify(context, "Classificazione del testo avvenuta con successo.", false);
+                });
+            } catch (e) {
+                setState(() {
+                    Util.notify(context, "Errore nella correzione del testo.", true);
+                });
+            }
+        }
     }
 
     @override
@@ -320,9 +362,17 @@ class _ArticleFormPage extends State<ArticleFormPage>
                         multiRowsDisplay: true,
                         customButtons: [
                             quill.QuillToolbarCustomButtonOptions(
-                                icon: Icon(Icons.spellcheck),
+                                icon: Icon(Icons.spellcheck, color: Colors.blue),
                                 onPressed: () {
-                                    corrector();
+                                    setState(() {
+                                        isLoadingSummary = true;
+                                    });
+
+                                    corrector(_abstractController);
+
+                                    setState(() {
+                                        isLoadingSummary = false;
+                                    });
                                 },
                                 tooltip: 'Correzione del testo con AI.',
                             ),
@@ -330,25 +380,28 @@ class _ArticleFormPage extends State<ArticleFormPage>
                     ),
                 ),
             ),
-            Container(
-                constraints: const BoxConstraints(minHeight: 100),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
-                    color: Colors.white,
-                ),
-                child: quill.QuillEditor.basic(
-                    controller: _abstractController,
-                    config: const quill.QuillEditorConfig(
-                        placeholder: "Inserisci una sintesi...",
-                        scrollable: true,
-                        expands: false,
-                        padding: EdgeInsets.zero,
-                        autoFocus: false,
+            if (isLoadingSummary)
+                Util.isLoading()
+            else
+                Container(
+                    constraints: const BoxConstraints(minHeight: 100),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+                        color: Colors.white,
+                    ),
+                    child: quill.QuillEditor.basic(
+                        controller: _abstractController,
+                        config: const quill.QuillEditorConfig(
+                            placeholder: "Inserisci una sintesi...",
+                            scrollable: true,
+                            expands: false,
+                            padding: EdgeInsets.zero,
+                            autoFocus: false,
+                        ),
                     ),
                 ),
-            ),
         ];
     }
 
@@ -368,7 +421,7 @@ class _ArticleFormPage extends State<ArticleFormPage>
                 ),
                 child: quill.QuillSimpleToolbar(
                     controller: _bodyController,
-                    config: const quill.QuillSimpleToolbarConfig(
+                    config: quill.QuillSimpleToolbarConfig(
                         showFontFamily: false,
                         showFontSize: false,
                         showBoldButton: true,
@@ -389,28 +442,63 @@ class _ArticleFormPage extends State<ArticleFormPage>
                         showSubscript: false,
                         showSuperscript: false,
                         multiRowsDisplay: false,
+                        customButtons: [
+                            quill.QuillToolbarCustomButtonOptions(
+                                icon: Icon(Icons.spellcheck, color: Colors.blue),
+                                onPressed: () {
+                                    setState(() {
+                                        isLoadingBody = true;
+                                    });
+
+                                    corrector(_bodyController);
+
+                                    setState(() {
+                                        isLoadingBody = false;
+                                    });
+                                },
+                                tooltip: 'Correzione del testo con AI.',
+                            ),
+                            quill.QuillToolbarCustomButtonOptions(
+                                icon: Icon(Icons.category_rounded, color: Colors.blue),
+                                onPressed: () {
+                                    setState(() {
+                                        isLoadingSelectedCategory=true;
+                                    });
+
+                                    classifier(_bodyController);
+
+                                    setState(() {
+                                        isLoadingSelectedCategory=false;
+                                    });
+                                },
+                                tooltip: 'Classificazione del testo con AI.',
+                            ),
+                        ],
                     ),
                 ),
             ),
-            Container(
-                constraints: const BoxConstraints(minHeight: 100),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
-                    color: Colors.white,
-                ),
-                child: quill.QuillEditor.basic(
-                    controller: _bodyController,
-                    config: const quill.QuillEditorConfig(
-                        placeholder: "Inserisci il contenuto...",
-                        scrollable: true,
-                        expands: false,
-                        padding: EdgeInsets.zero,
-                        autoFocus: false,
+            if (isLoadingSummary)
+                Util.isLoading()
+            else
+                Container(
+                    constraints: const BoxConstraints(minHeight: 100),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+                        color: Colors.white,
+                    ),
+                    child: quill.QuillEditor.basic(
+                        controller: _bodyController,
+                        config: const quill.QuillEditorConfig(
+                            placeholder: "Inserisci il contenuto...",
+                            scrollable: true,
+                            expands: false,
+                            padding: EdgeInsets.zero,
+                            autoFocus: false,
+                        ),
                     ),
                 ),
-            ),
         ];
     }
 
@@ -460,6 +548,18 @@ class _ArticleFormPage extends State<ArticleFormPage>
 
     List<Widget> _buildCategory() 
     {
+        if (isLoadingSelectedCategory)
+            return [
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                        Text(
+                            'Classificazione dell\'articolo...',
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                    ],
+                ),
+            ];
         return [
             Row(
                 mainAxisAlignment: MainAxisAlignment.center,

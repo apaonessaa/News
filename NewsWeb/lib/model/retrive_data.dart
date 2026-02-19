@@ -32,7 +32,7 @@ class RetriveData
         }
     }
 
-    Future<String> classifier(String text, List<String> labels) async 
+    Future<List<String>> classifier(String text, List<String> labels) async 
     {
         final body = { 'text': text, 'labels': labels };
 

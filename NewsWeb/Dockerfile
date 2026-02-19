@@ -1,3 +1,4 @@
+# --- Build ---
 FROM ubuntu:22.04 AS build
 
 RUN apt-get update -y && apt-get install -y curl git unzip xz-utils zip libglu1-mesa
@@ -27,7 +28,6 @@ COPY ./pubspec.yaml ./pubspec.yaml
 RUN flutter clean && flutter pub get
 RUN flutter build web --no-pub --release --no-wasm-dry-run --no-tree-shake-icons -O4 -o /tmp/web
 
-# --- TEST ---
+# --- Entry point ---
 FROM nginx:alpine
 COPY --from=build /tmp/web /usr/share/nginx/html
-

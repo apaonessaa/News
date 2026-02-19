@@ -1,3 +1,4 @@
+# -- Build ---
 FROM python:3.10-slim
 
 ARG HF_TOKEN
@@ -16,8 +17,9 @@ RUN pip install -r requirements.txt
 ENV HF_TOKEN=${HF_TOKEN}
 ENV HF_API=${HF_API}
 
+# --- WSGI ---
+RUN pip install gunicorn==25.1.0
+
 EXPOSE 8000
 
-ENTRYPOINT ["python3"]
-
-CMD ["main.py"]
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:8000", "main:app"]

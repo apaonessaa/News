@@ -1,3 +1,4 @@
+# --- Build ---
 FROM python:3.10-slim
 
 ARG HF_MODEL
@@ -17,6 +18,7 @@ RUN python3 download_models.py
 
 EXPOSE 8000
 
-ENTRYPOINT ["python3"]
+# --- WSGI ---
+RUN pip install gunicorn==25.1.0
 
-CMD ["main.py"]
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:8000", "main:app"]
