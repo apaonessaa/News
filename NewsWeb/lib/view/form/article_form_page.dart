@@ -41,6 +41,7 @@ class _ArticleFormPage extends State<ArticleFormPage>
     Set<String> selectedSubcategories = {};
 
     bool isSaving = false;
+    bool isLoadingSummary = false;
 
     @override
     void initState() 
@@ -190,6 +191,29 @@ class _ArticleFormPage extends State<ArticleFormPage>
         }
     }
 
+    void corrector() async
+    {
+        setState(() {
+            isLoadingSummary=true;
+        });
+
+        final text = _abstractController.document.toPlainText().trim();
+        try {
+            final result = await RetriveData.sharedInstance.corrector(text);
+            print(result);
+            setState(() {
+                Util.notify(context, "Il testo è stato corretto.", false);
+            });
+        } catch (e) {
+            setState(() {
+                Util.notify(context, "Errore nella correzione del testo.", true);
+            });
+        }
+        setState(() {
+            isLoadingSummary=false;
+        });
+    }
+
     @override
     Widget build(BuildContext context) 
     {
@@ -273,7 +297,7 @@ class _ArticleFormPage extends State<ArticleFormPage>
                 ),
                 child: quill.QuillSimpleToolbar(
                     controller: _abstractController,
-                    config: const quill.QuillSimpleToolbarConfig(
+                    config: quill.QuillSimpleToolbarConfig(
                         showFontFamily: false,
                         showFontSize: false,
                         showBoldButton: true,
@@ -294,6 +318,15 @@ class _ArticleFormPage extends State<ArticleFormPage>
                         showSubscript: false,
                         showSuperscript: false,
                         multiRowsDisplay: true,
+                        customButtons: [
+                            quill.QuillToolbarCustomButtonOptions(
+                                icon: Icon(Icons.spellcheck),
+                                onPressed: () {
+                                    corrector();
+                                },
+                                tooltip: 'Correzione del testo con AI.',
+                            ),
+                        ],
                     ),
                 ),
             ),

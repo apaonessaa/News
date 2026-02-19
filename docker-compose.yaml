@@ -1,26 +1,54 @@
 services:
-  news-api:
-    build: NewsAPI
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://news-db:3306/newsdb
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-    ports:
-      - "8081:8081"
-    depends_on:
-      news-db:
-        condition: service_healthy
 
-  news-db:
+  database:
     image: mysql:latest
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: newsdb
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWD}
+      - MYSQL_USER=${DB_SPRING_USER}
+      - MYSQL_PASSWORD=${DB_SPRING_PASSWD}
+      - MYSQL_DATABASE=news
     ports:
-      - "3306:3306"
+      - 3306:3306
+    volumes:
+      - persist-db:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       retries: 5
       start_period: 10s
       timeout: 5s
+
+  server:
+    build: NewsAPI
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/news
+      - SPRING_DATASOURCE_USERNAME=${DB_SPRING_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_SPRING_PASSWD}
+    ports:
+      - 8081:8081
+    volumes:
+      - persist-server:/home/spring/images
+    depends_on:
+      database:
+        condition: service_healthy
+
+  classifier:
+    build: NewsAI/Classifier
+    environment:
+      - HF_TOKEN=${CLASSIFIER_TOKEN}
+      - HF_API=${CLASSIFIER_API}
+    ports:
+      - 8082:8000
+
+  corrector:
+    build: NewsAI/Corrector
+    environment:
+      - HF_TOKEN=${CORRECTOR_TOKEN}
+      - HF_API=${CORRECTOR_API}
+      - HF_MODEL=${CORRECTOR_MODEL}
+    ports:
+      - 8083:8000
+
+volumes:
+  persist-db:
+  persist-server:

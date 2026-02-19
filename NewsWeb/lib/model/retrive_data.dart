@@ -10,6 +10,50 @@ class RetriveData
 {
     static RetriveData sharedInstance = RetriveData();
 
+    Future<String> corrector(String text) async 
+    {
+        final body = { 'text': text, };
+
+        try {
+            dynamic response = await Service.request(
+                HttpMethod.POST,
+                Endpoints.CORRECTOR,
+                '', 
+                body: body,
+            );
+
+            if (response != null && response['result'] != null) {
+                return response['result'];
+            } else {
+                throw Exception('Risultato non presente nella risposta');
+            }
+        } catch (error) {
+            throw Exception('Errore nella richiesta di correzione: $error');
+        }
+    }
+
+    Future<String> classifier(String text, List<String> labels) async 
+    {
+        final body = { 'text': text, 'labels': labels };
+
+        try {
+            dynamic response = await Service.request(
+                HttpMethod.POST,
+                Endpoints.CLASSIFIER,
+                '', 
+                body: body,
+            );
+
+            if (response != null && response['result'] != null) {
+                return response['result'];
+            } else {
+                throw Exception('Risultato non presente nella risposta');
+            }
+        } catch (error) {
+            throw Exception('Errore nella richiesta di correzione: $error');
+        }
+    }
+
     Future<Subcategory> getSubcategory(String category, String subcategory) async 
     {
         try {
@@ -37,7 +81,6 @@ class RetriveData
             throw Exception();
         }
     }
-
 
     Future<PaginatedArticles?> getArticleByCategory(String cat, int pageNumber, int pageSize) async 
     {
@@ -86,8 +129,6 @@ class RetriveData
             throw Exception('Error fetching articles');
         }
     }
-
-    
 
     Future<PaginatedArticles?> getMainArticles(int pageNumber, int pageSize) async 
     {

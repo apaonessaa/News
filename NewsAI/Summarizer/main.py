@@ -1,5 +1,9 @@
-from flask import Flask, request, jsonify
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+cors = CORS(app)
 
 def get_model(model_path):
     """Load a Hugging Face model and tokenizer from the specified directory"""
@@ -23,8 +27,6 @@ gen_kwargs = {
     "encoder_no_repeat_ngram_size": 4,
     "no_repeat_ngram_size": 6,
 }
-
-app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
 def generate():

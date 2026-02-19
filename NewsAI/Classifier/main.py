@@ -1,5 +1,10 @@
 import os
 import requests
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+cors = CORS(app)
 
 API_URL = os.getenv('HF_API')
 headers = { "Authorization": f"Bearer {os.getenv('HF_TOKEN')}" }
@@ -11,10 +16,6 @@ def query(text, labels):
     }
     response = requests.post(API_URL, headers=headers, json=payload)
     return response.json(), response.status_code
-
-from flask import Flask, request, jsonify
-
-app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
 def classifier():

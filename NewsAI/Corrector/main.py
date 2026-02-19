@@ -1,5 +1,10 @@
 import os
 import requests
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+cors = CORS(app)
 
 HF_MODEL = os.getenv('HF_MODEL')
 HF_API = os.getenv('HF_API')
@@ -19,10 +24,6 @@ def query(text):
     }
     response = requests.post(HF_API, headers=headers, json=payload)
     return response.json()["choices"][0]["message"]["content"], response.status_code
-
-from flask import Flask, request, jsonify
-
-app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
 def corrector():
