@@ -1,10 +1,18 @@
 FROM quay.io/keycloak/keycloak:latest
+
+# Bootstrap Keycloak admin
 ENV KC_BOOTSTRAP_ADMIN_USERNAME=keycloak-admin
 ENV KC_BOOTSTRAP_ADMIN_PASSWORD=Password123!
-#ENV KC_DB=postgres
-#ENV KC_DB_URL_HOST=keycloak-postgres
-#ENV KC_DB_URL_DATABASE=keycloak
-#ENV KC_DB_USERNAME=keycloak
-#ENV KC_DB_PASSWORD=password
+
+# Front channel settings
+ENV KC_HOSTNAME_BACKCHANNEL_DYNAMIC=true
+ENV KC_HOSTNAME=http://keycloak:8080/
+
+# Import the configurations
+ENV KC_IMPORT=/opt/keycloak/data/import/
+COPY ./export /opt/keycloak/data/import/
+
 EXPOSE 8080
-ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev"]
+
+# Production: start
+ENTRYPOINT ["/opt/keycloak/bin/kc.sh", "start-dev", "--import-realm"]

@@ -21,3 +21,10 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: create
+
+#### Health check ####
+managament:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure.include: health

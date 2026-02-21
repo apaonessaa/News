@@ -29,7 +29,7 @@ public class SecurityConfiguration
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:8080"); // Allow CORS
+        config.addAllowedOrigin("http://localhost:*"); // Allow CORS
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);

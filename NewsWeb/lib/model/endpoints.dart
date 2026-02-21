@@ -1,6 +1,6 @@
 class Endpoints 
 {
-    static const String REMOTE_API = "http://server:8081/api/";
+    static const String REMOTE_API = "http://localhost:8080/api/";
     static const String ARTICLE = "articles";
 
     static String article(String title) {
@@ -30,6 +30,6 @@ class Endpoints
     }
 
     //static const String SUMMARIZER = "http://summarizer:8083/";
-    static const String CLASSIFIER = "http://classifier:8082/";
-    static const String CORRECTOR = "http://corrector:8083/";
+    static const String CLASSIFIER = "http://localhost:8080/ai/classifier/";
+    static const String CORRECTOR = "http://localhost:8080/ai/corrector/";
 }

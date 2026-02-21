@@ -1,6 +1,18 @@
 # **Progetto di Sistemi Distribuiti e Cloud Computing**
 
 
+## Architettura
+
+## Reverse proxy
+
+[NGINX]
+Il reverse proxy viene definito per la gestione del traffico di rete.
+
+
+
+
+
+
 Admin
 - firstname
 - lastname

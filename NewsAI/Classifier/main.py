@@ -17,6 +17,11 @@ def query(text, labels):
     response = requests.post(API_URL, headers=headers, json=payload)
     return response.json(), response.status_code
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    print("Health check.")
+    return 'UP', 200
+
 @app.route('/', methods=['POST'])
 def classifier():
     """Label classification from a text."""

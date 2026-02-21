@@ -25,6 +25,11 @@ def query(text):
     response = requests.post(HF_API, headers=headers, json=payload)
     return response.json()["choices"][0]["message"]["content"], response.status_code
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    print("Health check requested!")
+    return 'UP', 200
+
 @app.route('/', methods=['POST'])
 def corrector():
     """Text grammar corrector."""
@@ -35,7 +40,7 @@ def corrector():
         res, status_code = query(text)
         
         if status_code != 200:
-            return jsonify({'error': 'HF API'}), code
+            return jsonify({'error': 'HF API'}), status_code
         
         unescaped_res = res.encode('utf-8').decode('unicode_escape') 
         

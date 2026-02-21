@@ -28,6 +28,11 @@ gen_kwargs = {
     "no_repeat_ngram_size": 6,
 }
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    print("Health check requested!")
+    return 'UP', 200
+
 @app.route('/', methods=['POST'])
 def generate():
     """Generate a text from source text."""
