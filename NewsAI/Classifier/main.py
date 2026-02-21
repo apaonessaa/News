@@ -1,10 +1,8 @@
 import os
 import requests
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 
 app = Flask(__name__)
-cors = CORS(app)
 
 API_URL = os.getenv('HF_API')
 headers = { "Authorization": f"Bearer {os.getenv('HF_TOKEN')}" }
@@ -22,7 +20,7 @@ def health_check():
     print("Health check.")
     return 'UP', 200
 
-@app.route('/', methods=['POST'])
+@app.route('/query', methods=['POST'])
 def classifier():
     """Label classification from a text."""
     data = request.get_json()

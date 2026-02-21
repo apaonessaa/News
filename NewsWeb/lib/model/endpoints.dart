@@ -30,6 +30,6 @@ class Endpoints
     }
 
     //static const String SUMMARIZER = "http://summarizer:8083/";
-    static const String CLASSIFIER = "http://localhost:8080/ai/classifier/";
-    static const String CORRECTOR = "http://localhost:8080/ai/corrector/";
+    static const String CLASSIFIER = "http://localhost:8080/ai/classifier";
+    static const String CORRECTOR = "http://localhost:8080/ai/corrector";
 }

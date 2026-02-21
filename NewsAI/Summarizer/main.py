@@ -1,9 +1,7 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 
 app = Flask(__name__)
-cors = CORS(app)
 
 def get_model(model_path):
     """Load a Hugging Face model and tokenizer from the specified directory"""
@@ -33,7 +31,7 @@ def health_check():
     print("Health check requested!")
     return 'UP', 200
 
-@app.route('/', methods=['POST'])
+@app.route('/query', methods=['POST'])
 def generate():
     """Generate a text from source text."""
     data = request.get_json()

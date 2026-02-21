@@ -1,10 +1,8 @@
 import os
 import requests
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 
 app = Flask(__name__)
-cors = CORS(app)
 
 HF_MODEL = os.getenv('HF_MODEL')
 HF_API = os.getenv('HF_API')
@@ -30,7 +28,7 @@ def health_check():
     print("Health check requested!")
     return 'UP', 200
 
-@app.route('/', methods=['POST'])
+@app.route('/query', methods=['POST'])
 def corrector():
     """Text grammar corrector."""
     data = request.get_json()
