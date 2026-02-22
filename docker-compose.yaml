@@ -1,31 +1,44 @@
-services:
+volumes:
+  persist-db:
+  persist-server:
 
+networks:
+  backend-net:
+    driver: bridge
+
+services:
   database:
     image: mysql:latest
+    volumes:
+      - persist-db:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWD}
       - MYSQL_USER=${DB_SPRING_USER}
       - MYSQL_PASSWORD=${DB_SPRING_PASSWD}
       - MYSQL_DATABASE=news
-    volumes:
-      - persist-db:/var/lib/mysql
+    expose:
+      - 3306
+    networks:
+      - backend-net
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       retries: 5
       start_period: 10s
       timeout: 5s
-    networks:
-      - backend
 
   server:
     build: NewsAPI
+    volumes:
+      - persist-server:/home/spring/images
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/news
       - SPRING_DATASOURCE_USERNAME=${DB_SPRING_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_SPRING_PASSWD}
-    volumes:
-      - persist-backend:/home/spring/images
+    expose:
+      - 8081
+    networks:
+      - backend-net
     depends_on:
       database:
         condition: service_healthy
@@ -35,24 +48,24 @@ services:
       retries: 5
       start_period: 15s
       timeout: 10s
-    networks:
-      - backend
 
   classifier:
     build: NewsAI/Classifier
     environment:
       - HF_TOKEN=${CLASSIFIER_TOKEN}
       - HF_API=${CLASSIFIER_API}
+    expose:
+      - 8000
+    networks:
+      backend-net:
+        aliases:
+          - ai.classifier
     healthcheck:
       test: curl --fail http://localhost:8000/health || exit 1
       interval: 10s
       retries: 5
       start_period: 10s
       timeout: 10s
-    networks:
-      backend:
-        aliases:
-          - ai.classifier
 
   corrector:
     build: NewsAI/Corrector
@@ -60,31 +73,27 @@ services:
       - HF_TOKEN=${CORRECTOR_TOKEN}
       - HF_API=${CORRECTOR_API}
       - HF_MODEL=${CORRECTOR_MODEL}
+    expose:
+      - 8000
+    networks:
+      backend-net:
+        aliases:
+          - ai.corrector
     healthcheck:
       test: curl --fail http://localhost:8000/health || exit 1
       interval: 10s
       retries: 5
       start_period: 10s
       timeout: 10s
-    networks:
-      backend:
-        aliases:
-          - ai.corrector
 
-  reverse-proxy:
+  reverse_proxy:
     build: NewsReverseProxy
+    restart: always
     ports:
       - 8080:80
+    expose:
+      - 80
+    networks:
+      - backend-net
     depends_on:
       server: { condition: service_healthy }
-    restart: always
-    networks:
-      - backend
-
-volumes:
-  persist-db:
-  persist-backend:
-
-networks:
-  backend:
-    driver: bridge
