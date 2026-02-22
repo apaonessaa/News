@@ -72,8 +72,8 @@
       "composites" : {
         "realm" : [ "create-realm" ],
         "client" : {
-          "NewsRealm-realm" : [ "manage-identity-providers", "manage-events", "impersonation", "create-client", "view-authorization", "query-realms", "manage-realm", "view-events", "view-identity-providers", "view-realm", "query-users", "manage-authorization", "view-clients", "manage-users", "view-users", "query-groups", "query-clients", "manage-clients" ],
-          "master-realm" : [ "view-clients", "manage-authorization", "manage-identity-providers", "manage-events", "manage-users", "query-realms", "manage-clients", "view-identity-providers", "query-groups", "impersonation", "query-users", "query-clients", "create-client", "view-authorization", "manage-realm", "view-events", "view-users", "view-realm" ]
+          "master-realm" : [ "view-clients", "manage-authorization", "manage-identity-providers", "manage-events", "manage-users", "query-realms", "manage-clients", "view-identity-providers", "query-groups", "impersonation", "query-users", "query-clients", "create-client", "view-authorization", "manage-realm", "view-events", "view-users", "view-realm" ],
+          "News-realm" : [ "manage-identity-providers", "manage-events", "impersonation", "create-client", "view-authorization", "query-realms", "manage-realm", "view-events", "view-identity-providers", "view-realm", "query-users", "manage-authorization", "view-clients", "manage-users", "view-users", "query-groups", "query-clients", "manage-clients" ]
         }
       },
       "clientRole" : false,
@@ -103,161 +103,6 @@
       "attributes" : { }
     } ],
     "client" : {
-      "NewsRealm-realm" : [ {
-        "id" : "f9ccba07-f67b-494c-8978-be8fa941bbb4",
-        "name" : "view-realm",
-        "description" : "${role_view-realm}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "ba81e191-fa7e-4493-9adc-fe21dab95d5c",
-        "name" : "query-users",
-        "description" : "${role_query-users}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "c0d7b25f-f645-4521-8315-cedf13e55bc3",
-        "name" : "manage-events",
-        "description" : "${role_manage-events}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "40d8e295-d76c-475d-94d6-830edc734e02",
-        "name" : "manage-identity-providers",
-        "description" : "${role_manage-identity-providers}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "f2552f23-7fc9-4dde-843d-19c4d8479882",
-        "name" : "manage-authorization",
-        "description" : "${role_manage-authorization}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "0d11f682-42ca-487c-90c5-e0bcb204e9bd",
-        "name" : "create-client",
-        "description" : "${role_create-client}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "099cedd2-49c3-472e-88d7-c58304e8d37e",
-        "name" : "impersonation",
-        "description" : "${role_impersonation}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "e7c9ab39-559a-40ae-9e0f-a50ce6c36e48",
-        "name" : "manage-users",
-        "description" : "${role_manage-users}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "b8e5fee3-cad6-4df6-9d85-3436fadefcfa",
-        "name" : "view-clients",
-        "description" : "${role_view-clients}",
-        "composite" : true,
-        "composites" : {
-          "client" : {
-            "NewsRealm-realm" : [ "query-clients" ]
-          }
-        },
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "83df7d97-a72a-4f3d-8d15-5215361f5ab5",
-        "name" : "view-authorization",
-        "description" : "${role_view-authorization}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "3476b37f-3a9e-4b21-b494-41c7f9974e6b",
-        "name" : "view-users",
-        "description" : "${role_view-users}",
-        "composite" : true,
-        "composites" : {
-          "client" : {
-            "NewsRealm-realm" : [ "query-groups", "query-users" ]
-          }
-        },
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "65aec70d-a1ce-40e0-add4-a351fc131c4d",
-        "name" : "query-groups",
-        "description" : "${role_query-groups}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "8be17885-7400-4235-9bdb-98b0117037cd",
-        "name" : "query-clients",
-        "description" : "${role_query-clients}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "e910f634-14fe-4758-b76e-bff30fae7994",
-        "name" : "manage-realm",
-        "description" : "${role_manage-realm}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "3ba04cb9-926f-4366-9e88-67011d4a5280",
-        "name" : "query-realms",
-        "description" : "${role_query-realms}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "d845104a-33e0-4c7e-bfff-32e6913397a2",
-        "name" : "manage-clients",
-        "description" : "${role_manage-clients}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "54ac094f-2de6-4ac5-a54d-70ccf7e2ec93",
-        "name" : "view-events",
-        "description" : "${role_view-events}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      }, {
-        "id" : "0c0bd55f-fde0-426b-a2bd-17b33ea5adf8",
-        "name" : "view-identity-providers",
-        "description" : "${role_view-identity-providers}",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-        "attributes" : { }
-      } ],
       "security-admin-console" : [ ],
       "admin-cli" : [ ],
       "account-console" : [ ],
@@ -425,6 +270,161 @@
         "containerId" : "7435b6f6-410e-40a6-920d-f35ab08d7aea",
         "attributes" : { }
       } ],
+      "News-realm" : [ {
+        "id" : "f9ccba07-f67b-494c-8978-be8fa941bbb4",
+        "name" : "view-realm",
+        "description" : "${role_view-realm}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "ba81e191-fa7e-4493-9adc-fe21dab95d5c",
+        "name" : "query-users",
+        "description" : "${role_query-users}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "c0d7b25f-f645-4521-8315-cedf13e55bc3",
+        "name" : "manage-events",
+        "description" : "${role_manage-events}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "40d8e295-d76c-475d-94d6-830edc734e02",
+        "name" : "manage-identity-providers",
+        "description" : "${role_manage-identity-providers}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "f2552f23-7fc9-4dde-843d-19c4d8479882",
+        "name" : "manage-authorization",
+        "description" : "${role_manage-authorization}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "0d11f682-42ca-487c-90c5-e0bcb204e9bd",
+        "name" : "create-client",
+        "description" : "${role_create-client}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "099cedd2-49c3-472e-88d7-c58304e8d37e",
+        "name" : "impersonation",
+        "description" : "${role_impersonation}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "e7c9ab39-559a-40ae-9e0f-a50ce6c36e48",
+        "name" : "manage-users",
+        "description" : "${role_manage-users}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "b8e5fee3-cad6-4df6-9d85-3436fadefcfa",
+        "name" : "view-clients",
+        "description" : "${role_view-clients}",
+        "composite" : true,
+        "composites" : {
+          "client" : {
+            "News-realm" : [ "query-clients" ]
+          }
+        },
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "83df7d97-a72a-4f3d-8d15-5215361f5ab5",
+        "name" : "view-authorization",
+        "description" : "${role_view-authorization}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "3476b37f-3a9e-4b21-b494-41c7f9974e6b",
+        "name" : "view-users",
+        "description" : "${role_view-users}",
+        "composite" : true,
+        "composites" : {
+          "client" : {
+            "News-realm" : [ "query-groups", "query-users" ]
+          }
+        },
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "65aec70d-a1ce-40e0-add4-a351fc131c4d",
+        "name" : "query-groups",
+        "description" : "${role_query-groups}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "8be17885-7400-4235-9bdb-98b0117037cd",
+        "name" : "query-clients",
+        "description" : "${role_query-clients}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "e910f634-14fe-4758-b76e-bff30fae7994",
+        "name" : "manage-realm",
+        "description" : "${role_manage-realm}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "3ba04cb9-926f-4366-9e88-67011d4a5280",
+        "name" : "query-realms",
+        "description" : "${role_query-realms}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "d845104a-33e0-4c7e-bfff-32e6913397a2",
+        "name" : "manage-clients",
+        "description" : "${role_manage-clients}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "54ac094f-2de6-4ac5-a54d-70ccf7e2ec93",
+        "name" : "view-events",
+        "description" : "${role_view-events}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      }, {
+        "id" : "0c0bd55f-fde0-426b-a2bd-17b33ea5adf8",
+        "name" : "view-identity-providers",
+        "description" : "${role_view-identity-providers}",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
+        "attributes" : { }
+      } ],
       "account" : [ {
         "id" : "b5faa7df-d0e1-4878-84f3-e3bc22ef32bf",
         "name" : "manage-account",
@@ -555,7 +555,7 @@
   },
   "clients" : [ {
     "id" : "76403abc-5c77-49fd-a6cb-01e055e8f90e",
-    "clientId" : "NewsRealm-realm",
+    "clientId" : "News-realm",
     "name" : "NewsRealm Realm",
     "surrogateAuthRequired" : false,
     "enabled" : true,

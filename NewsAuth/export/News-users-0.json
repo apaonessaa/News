@@ -1,10 +1,10 @@
 {
-  "realm" : "NewsRealm",
+  "realm" : "News",
   "users" : [ {
     "id" : "f0e99abc-4961-4824-9389-fa2487919dec",
     "username" : "administrator",
-    "firstName" : "Admin",
-    "lastName" : "Istrator",
+    "firstName" : "Victor",
+    "lastName" : "Frankenstein",
     "email" : "administrator@news.com",
     "emailVerified" : true,
     "enabled" : true,

@@ -1,12 +1,13 @@
 volumes:
   persist-db:
-  persist-server:
+  persist-server:    
 
 networks:
   backend-net:
     driver: bridge
 
 services:
+  # --- Server ---
   database:
     image: mysql:latest
     volumes:
@@ -49,6 +50,7 @@ services:
       start_period: 15s
       timeout: 10s
 
+  # --- AI ---
   classifier:
     build: NewsAI/Classifier
     environment:
@@ -86,9 +88,31 @@ services:
       start_period: 10s
       timeout: 10s
 
+  # --- Authentication ---
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    volumes:
+      - ./NewsAuth/export:/opt/keycloak/data/import/:ro
+    environment:
+      - KC_IMPORT=/opt/keycloak/data/import/
+      - KC_HOSTNAME_STRICT=false  # Accept any hostname in receiving requests
+      - KC_HTTP_ENABLED=true      # Enable and expose HTTP port (8080)
+      - KC_HTTP_PORT=8080
+      - KC_HTTP_RELATIVE_PATH=/
+    entrypoint: ["/opt/keycloak/bin/kc.sh", "start-dev", "--import-realm", "--proxy-headers", "xforwarded"]
+    ports:
+      - 1234:8080
+    expose:
+      - 8080 # HTTP
+      - 9000 # healthcheck
+    networks:
+      - backend-net
+
+  # --- Reverse proxy ---
   reverse_proxy:
-    build: NewsReverseProxy
-    restart: always
+    image: nginx:latest
+    volumes:
+      - ./NewsProxy/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - 8080:80
     expose:
@@ -97,3 +121,6 @@ services:
       - backend-net
     depends_on:
       server: { condition: service_healthy }
+      keycloak: { condition: service_started }
+      corrector: { condition: service_started }
+      classifier: { condition: service_started }
