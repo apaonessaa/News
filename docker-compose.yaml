@@ -45,10 +45,10 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
-      interval: 10s
-      retries: 5
       start_period: 15s
+      interval: 10s
       timeout: 10s
+      retries: 3
 
   # --- AI ---
   classifier:
@@ -63,11 +63,11 @@ services:
         aliases:
           - ai.classifier
     healthcheck:
-      test: curl --fail http://localhost:8000/health || exit 1
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8000; echo -e 'GET /health HTTP/1.1\r\nHost: localhost:8000\r\nConnection: close\r\n\r\n' >&3;cat <&3 | grep -q 'UP' && exit 0 || exit 1"]
+      start_period: 5s
       interval: 10s
-      retries: 5
-      start_period: 10s
       timeout: 10s
+      retries: 3
 
   corrector:
     build: NewsAI/Corrector
@@ -82,29 +82,56 @@ services:
         aliases:
           - ai.corrector
     healthcheck:
-      test: curl --fail http://localhost:8000/health || exit 1
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8000; echo -e 'GET /health HTTP/1.1\r\nHost: localhost:8000\r\nConnection: close\r\n\r\n' >&3;cat <&3 | grep -q 'UP' && exit 0 || exit 1"]
+      start_period: 5s
       interval: 10s
-      retries: 5
-      start_period: 10s
       timeout: 10s
+      retries: 3
 
-  # --- Authentication ---
+  # === Authentication ===
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     volumes:
-      - ./NewsAuth/export:/opt/keycloak/data/import/:ro
+      - ./NewsAuth/Keycloak/import:/opt/keycloak/data/import/:ro
     environment:
+      # --- Proxy and Hostname Configuration ---
+      #- KC_PROXY_HEDERS=xforwarded
+      - KC_HOSTNAME=http://keycloak:8080
+      - KC_HOSTNAME_STRICT=false
+      - KC_HTTP_ENABLED=true
+
+      # --- Import Realms ---
       - KC_IMPORT=/opt/keycloak/data/import/
-      - KC_HOSTNAME_STRICT=false  # Accept any hostname in receiving requests
-      - KC_HTTP_ENABLED=true      # Enable and expose HTTP port (8080)
-      - KC_HTTP_PORT=8080
-      - KC_HTTP_RELATIVE_PATH=/
-    entrypoint: ["/opt/keycloak/bin/kc.sh", "start-dev", "--import-realm", "--proxy-headers", "xforwarded"]
+
+      # --- Logging and Metrics ---
+      - KC_LOG_LEVEL=info
+      - KC_HEALTH_ENABLED=true
+      - KC_METRICS_ENABLED=false
+    command:
+      - start-dev
+      - --import-realm
     ports:
       - 1234:8080
     expose:
-      - 8080 # HTTP
-      - 9000 # healthcheck
+      - 8080
+      - 9000
+    networks:
+      - backend-net
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000; echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost:9000\r\nConnection: close\r\n\r\n' >&3;cat <&3 | grep -q '\"status\": \"UP\"' && exit 0 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:latest
+    command: --config /oauth2-proxy.cfg
+    expose:
+      - 4180
+    volumes:
+      - ./NewsAuth/OAuth2/oauth2-proxy.cfg:/oauth2-proxy.cfg
+    depends_on:
+      keycloak: { condition: service_healthy }
     networks:
       - backend-net
 
@@ -120,7 +147,7 @@ services:
     networks:
       - backend-net
     depends_on:
+      oauth2-proxy: { condition: service_started }
       server: { condition: service_healthy }
-      keycloak: { condition: service_started }
-      corrector: { condition: service_started }
-      classifier: { condition: service_started }
+      #classifier: { condition: service_healthy }
+      #corrector: { condition: service_healthy }
