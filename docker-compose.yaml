@@ -7,7 +7,7 @@ networks:
     driver: bridge
 
 services:
-  # --- Server ---
+  # === Server ===
   database:
     image: mysql:latest
     volumes:
@@ -20,7 +20,9 @@ services:
     expose:
       - 3306
     networks:
-      - backend-net
+      backend-net:
+        aliases:
+          - news.backend.db
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -33,24 +35,26 @@ services:
     volumes:
       - persist-server:/home/spring/images
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/news
+      - SPRING_DATASOURCE_URL=jdbc:mysql://news.backend.db:3306/news
       - SPRING_DATASOURCE_USERNAME=${DB_SPRING_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_SPRING_PASSWD}
     expose:
-      - 8081
+      - 8000
     networks:
-      - backend-net
+      backend-net:
+        aliases:
+          - news.backend.server
     depends_on:
       database:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/actuator/health"]
       start_period: 15s
       interval: 10s
       timeout: 10s
       retries: 3
 
-  # --- AI ---
+  # === AI ===
   classifier:
     build: NewsAI/Classifier
     environment:
@@ -61,10 +65,9 @@ services:
     networks:
       backend-net:
         aliases:
-          - ai.classifier
+          - news.backend.classifier
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8000; echo -e 'GET /health HTTP/1.1\r\nHost: localhost:8000\r\nConnection: close\r\n\r\n' >&3;cat <&3 | grep -q 'UP' && exit 0 || exit 1"]
-      start_period: 5s
       interval: 10s
       timeout: 10s
       retries: 3
@@ -80,10 +83,9 @@ services:
     networks:
       backend-net:
         aliases:
-          - ai.corrector
+          - news.backend.corrector
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8000; echo -e 'GET /health HTTP/1.1\r\nHost: localhost:8000\r\nConnection: close\r\n\r\n' >&3;cat <&3 | grep -q 'UP' && exit 0 || exit 1"]
-      start_period: 5s
       interval: 10s
       timeout: 10s
       retries: 3
@@ -92,50 +94,61 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     volumes:
-      - ./NewsAuth/Keycloak/import:/opt/keycloak/data/import/:ro
+      - ./NewsAuth/export:/opt/keycloak/data/import/:ro
     environment:
-      # --- Proxy and Hostname Configuration ---
-      #- KC_PROXY_HEDERS=xforwarded
-      - KC_HOSTNAME=http://keycloak:8080
-      - KC_HOSTNAME_STRICT=false
+      # --- HTTP Configurations ---
       - KC_HTTP_ENABLED=true
-
-      # --- Import Realms ---
+      - KC_HTTP_HOST=0.0.0.0
+      - KC_HTTP_PORT=8000
+      # --- For Proxy Configurations ---
+      #- KC_HOSTNAME=news.keycloak
+      #- KC_HOSTNAME_PORT=8001
+      - KC_HOSTNAME_STRICT=false
+      - KC_PROXY_HEADERS=xforwarded
+      - KC_HOSTNAME_STRICT_HTTPS=false
+      # --- Realms ---
       - KC_IMPORT=/opt/keycloak/data/import/
-
       # --- Logging and Metrics ---
       - KC_LOG_LEVEL=info
       - KC_HEALTH_ENABLED=true
-      - KC_METRICS_ENABLED=false
+      - KC_METRICS_ENABLED=true
     command:
       - start-dev
       - --import-realm
     ports:
-      - 1234:8080
+      - 8000:8000
     expose:
-      - 8080
+      - 8000
       - 9000
     networks:
-      - backend-net
+      backend-net:
+        aliases:
+          - news.keycloak
+          - news-keycloak-alias.127.0.0.1.nip.io
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000; echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost:9000\r\nConnection: close\r\n\r\n' >&3;cat <&3 | grep -q '\"status\": \"UP\"' && exit 0 || exit 1"]
-      interval: 30s
-      timeout: 10s
+      start_period: 30s
+      interval: 20s
+      timeout: 20s
       retries: 3
 
   oauth2-proxy:
     image: quay.io/oauth2-proxy/oauth2-proxy:latest
-    command: --config /oauth2-proxy.cfg
-    expose:
-      - 4180
     volumes:
-      - ./NewsAuth/OAuth2/oauth2-proxy.cfg:/oauth2-proxy.cfg
+      - ./NewsAuth/oauth2-proxy.cfg:/oauth2-proxy.cfg
     depends_on:
       keycloak: { condition: service_healthy }
+    command:
+      - --config 
+      - /oauth2-proxy.cfg
+    expose: 
+      - 4180
     networks:
-      - backend-net
+      backend-net:
+        aliases:
+          - news.backend.oauth2
 
-  # --- Reverse proxy ---
+  # === Reverse proxy ===
   reverse_proxy:
     image: nginx:latest
     volumes:
@@ -145,7 +158,9 @@ services:
     expose:
       - 80
     networks:
-      - backend-net
+      backend-net:
+        aliases:
+          - news.backend
     depends_on:
       oauth2-proxy: { condition: service_started }
       server: { condition: service_healthy }

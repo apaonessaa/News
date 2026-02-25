@@ -1,5 +1,7 @@
 #!/bin/bash
 
+OAUTH2=$1
+
 CATEGORY_ENDPOINT='http://localhost:8080/api/categories'
 FILE_TO_READ="$PWD/init.json"
 
@@ -18,7 +20,8 @@ while IFS=$'\n' read -r cat; do
     # Create Category
     curl -s "$CATEGORY_ENDPOINT" \
         -X POST \
-        --header 'Content-Type: application/json' \
+        --header "_oauth2: $OAUTH2" \
+	--header 'Content-Type: application/json' \
         -d @- <<EOF 
 {"name": "$cat","description": "$cat_descr","subcategories": []}
 EOF
