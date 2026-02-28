@@ -1,8 +1,8 @@
 package com.app.news.services;
 
-import com.app.news.controllers.FileValidator;
 import com.app.news.services.interfaces.IFImageStorage;
 import com.app.news.exceptions.ImageStorageException;
+import com.app.news.services.validators.ImageValidator;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,18 +21,21 @@ import java.util.UUID;
 @Service
 public class ImageStorageService implements IFImageStorage<String, byte[]>
 {
-    private final FileValidator imgvald;
+    private final ImageValidator imgvald;
 
     private final Path root;
 
     public ImageStorageService(
-            @Value("${IMAGE_STORAGE_PATH:/home/spring/images}") String rootPath
+            @Value("${IMAGE_PATH:/home/spring/images}") String rootPath,
+            @Value("${IMAGE_CONFIG_PATH:/home/spring/config/validator.json}") String configPath
     )
     {
-        MediaType[] validContentType = {
-                MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG
-        };
-        this.imgvald = new FileValidator(Arrays.asList(validContentType));
+        MediaType[] validContentType = {MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG};
+        try {
+            this.imgvald = new ImageValidator(configPath, Arrays.asList(validContentType));
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        }
         this.root = Path.of(rootPath);
     }
 
@@ -55,7 +58,7 @@ public class ImageStorageService implements IFImageStorage<String, byte[]>
     {
         MediaType mt;
         try {
-            mt = imgvald.getValidMimeType(file);
+            mt = imgvald.getValidMediaType(file);
         } catch (InvalidMimeTypeException e) {
             throw new ImageStorageException("Error with file type.");
         }
@@ -78,13 +81,14 @@ public class ImageStorageService implements IFImageStorage<String, byte[]>
     @Override
     public String create(String filename, byte[] file)
     {
-        this.getMediaType(file);
+        if (!imgvald.validate(filename, file))
+            throw new ImageStorageException("Error during file validation of <"+filename+">.");
         String secureFilename = this.getSecureFilename(filename);
         Path target = root.resolve(secureFilename);
         try {
             Files.copy(new ByteArrayInputStream(file), target);
         } catch (IOException e) {
-            throw new ImageStorageException("Error during file copy of <"+filename+">.");
+            throw new ImageStorageException("Error during file creation of <"+filename+">.");
         }
         return secureFilename;
     }
@@ -92,7 +96,8 @@ public class ImageStorageService implements IFImageStorage<String, byte[]>
     @Override
     public void update(String filename, byte[] file)
     {
-        this.getMediaType(file);
+        if (!imgvald.validate(filename, file))
+            throw new ImageStorageException("Error during file validation of <"+filename+">.");
         if (!this.exist(filename))
             throw new ImageStorageException("The <"+filename+"> not exists.");
         Path target = root.resolve(filename);
@@ -109,7 +114,7 @@ public class ImageStorageService implements IFImageStorage<String, byte[]>
         try {
             Files.deleteIfExists(root.resolve(filename));
         } catch (IOException e) {
-            throw new ImageStorageException("Error during file copy of <"+filename+">.");
+            throw new ImageStorageException("Error during file deletion of <"+filename+">.");
         }
     }
 }

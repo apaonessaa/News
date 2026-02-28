@@ -100,13 +100,11 @@ services:
       - KC_HTTP_ENABLED=true
       - KC_HTTP_HOST=0.0.0.0
       - KC_HTTP_PORT=8000
-      # --- For Proxy Configurations ---
-      #- KC_HOSTNAME=news.keycloak
-      #- KC_HOSTNAME_PORT=8001
+      # --- Proxy Configurations ---
       - KC_HOSTNAME_STRICT=false
       - KC_PROXY_HEADERS=xforwarded
       - KC_HOSTNAME_STRICT_HTTPS=false
-      # --- Realms ---
+      # --- Realm ---
       - KC_IMPORT=/opt/keycloak/data/import/
       # --- Logging and Metrics ---
       - KC_LOG_LEVEL=info
@@ -123,7 +121,7 @@ services:
     networks:
       backend-net:
         aliases:
-          - news.keycloak
+          - news.backend.keycloak
           - news-keycloak-alias.127.0.0.1.nip.io
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000; echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost:9000\r\nConnection: close\r\n\r\n' >&3;cat <&3 | grep -q '\"status\": \"UP\"' && exit 0 || exit 1"]
