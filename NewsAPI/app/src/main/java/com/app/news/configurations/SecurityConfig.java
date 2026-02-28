@@ -23,34 +23,11 @@ public class SecurityConfig
     {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+		.cors(AbstractHttpConfigurer::disable)
 		.httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 	
 	return http.build();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigSource()
-    {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:*"));
-        config.setAllowedMethods(List.of(
-                HttpMethod.OPTIONS.name(),
-                HttpMethod.GET.name(),
-                HttpMethod.POST.name(),
-                HttpMethod.PUT.name(),
-                HttpMethod.DELETE.name()
-        ));
-        config.setAllowedHeaders(List.of(
-                HttpHeaders.CONTENT_TYPE,
-                HttpHeaders.AUTHORIZATION
-        ));
-
-        // Register the configuration for /api/**
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config);
-        return source;
     }
 }

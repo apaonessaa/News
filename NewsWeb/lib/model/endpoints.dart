@@ -1,6 +1,11 @@
 class Endpoints 
 {
-    static const String REMOTE_API = "http://localhost:8080/api/";
+    static const String SERVICE_DOMAIN = String.fromEnvironment('SERVICE_DOMAIN', defaultValue:'localhost:8080');
+
+    static String SERVER = "http://$SERVICE_DOMAIN/api/";
+    static String CLASSIFIER = "http://$SERVICE_DOMAIN/ai/classifier";
+    static String CORRECTOR = "http://$SERVICE_DOMAIN/ai/corrector";
+
     static const String ARTICLE = "articles";
 
     static String article(String title) {
@@ -28,8 +33,4 @@ class Endpoints
     static String subcategory_articles(String category, String subcategory) {
         return "${CATEGORY}/${category}/subcategories/${subcategory}/articles";
     }
-
-    //static const String SUMMARIZER = "http://summarizer:8083/";
-    static const String CLASSIFIER = "http://localhost:8080/ai/classifier";
-    static const String CORRECTOR = "http://localhost:8080/ai/corrector";
 }

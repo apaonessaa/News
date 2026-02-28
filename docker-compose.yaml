@@ -164,3 +164,20 @@ services:
       server: { condition: service_healthy }
       #classifier: { condition: service_healthy }
       #corrector: { condition: service_healthy }
+
+  # === Web app ===
+  web-app:
+    build:
+      context: NewsWeb
+      args:
+        - SERVICE_DOMAIN=localhost:8080
+    ports:
+      - 80:80
+    expose:
+      - 80
+    networks:
+      backend-net:
+        aliases:
+          - news.frontend.web
+    depends_on:
+      reverse_proxy: { condition: service_started }

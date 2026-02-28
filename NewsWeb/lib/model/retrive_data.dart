@@ -59,7 +59,7 @@ class RetriveData
         try {
             dynamic response = await Service.request(
                 HttpMethod.GET,
-                Endpoints.REMOTE_API,
+                Endpoints.SERVER,
                 Endpoints.subcategory(category, subcategory)
             );
             return Subcategory.fromJson(response);
@@ -73,7 +73,7 @@ class RetriveData
         try {
             dynamic response = await Service.request(
                 HttpMethod.GET,
-                Endpoints.REMOTE_API,
+                Endpoints.SERVER,
                 Endpoints.category(category)
             );
             return Category.fromJson(response);
@@ -87,7 +87,7 @@ class RetriveData
         try {
             dynamic response = await Service.request(
             HttpMethod.GET,
-            Endpoints.REMOTE_API,
+            Endpoints.SERVER,
             Endpoints.category_articles(cat),
             params: {
                 'pageNumber': '$pageNumber',
@@ -111,7 +111,7 @@ class RetriveData
         try {
             dynamic response = await Service.request(
             HttpMethod.GET,
-            Endpoints.REMOTE_API,
+            Endpoints.SERVER,
             Endpoints.subcategory_articles(cat,subcat),
             params: {
                 'pageNumber': '$pageNumber',
@@ -135,7 +135,7 @@ class RetriveData
         try {
             dynamic response = await Service.request(
             HttpMethod.GET,
-            Endpoints.REMOTE_API,
+            Endpoints.SERVER,
             Endpoints.ARTICLE,
             params: {
                 'pageNumber': '$pageNumber',
@@ -159,7 +159,7 @@ class RetriveData
         try {
             dynamic response = await Service.request(
                 HttpMethod.GET,
-                Endpoints.REMOTE_API,
+                Endpoints.SERVER,
                 Endpoints.article(title)
             );
             return Article.fromJson(response);
@@ -173,7 +173,7 @@ class RetriveData
         try {
             dynamic response = await Service.request(
                 HttpMethod.GET,
-                Endpoints.REMOTE_API,
+                Endpoints.SERVER,
                 type: TypeHeader.IMAGE,
                 Endpoints.image(title)
             );
@@ -188,7 +188,7 @@ class RetriveData
         try {
             dynamic response = await Service.request(
                 HttpMethod.GET,
-                Endpoints.REMOTE_API,
+                Endpoints.SERVER,
                 Endpoints.CATEGORY
             );
             if (response == null) {
