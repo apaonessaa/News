@@ -581,19 +581,21 @@ class _ArticleFormPage extends State<ArticleFormPage>
                             'Seleziona una categoria per l\'articolo.',
                             categories.map((category) {
                                 final isSelected = selectedCategory?.name == category.name;
-                                return FilterChip(
-                                    label: Text(category.name),
-                                    selected: isSelected,
-                                    selectedColor: Colors.red,
-                                    checkmarkColor: Colors.black,
-                                    onSelected: (selected) {
-                                        setState(() {
-                                            selectedCategory = category;
-                                            selectedSubcategories = {}; 
-                                        });
-                                        Navigator.pop(context);
-                                    },
-                                );
+                                return Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: FilterChip(
+                                        label: Text(category.name),
+                                        selected: isSelected,
+                                        selectedColor: Colors.red,
+                                        checkmarkColor: Colors.black,
+                                        onSelected: (selected) {
+                                            setState(() {
+                                                selectedCategory = category;
+                                                selectedSubcategories = {}; 
+                                            });
+                                            Navigator.pop(context);
+                                        },
+                                ));
                                 }).toList()
                         )                    
                     )

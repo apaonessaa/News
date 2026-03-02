@@ -28,7 +28,7 @@ class Service
       headers[HttpHeaders.contentTypeHeader] = 'application/x-www-form-urlencoded';
       requestBody = body?.keys.map((key) => "$key=${Uri.encodeComponent(body[key])}").join("&");
     } else if (type == TypeHeader.IMAGE) {
-      headers[HttpHeaders.acceptHeader] = 'image/*';  // Supporta qualsiasi tipo di immagine
+      headers[HttpHeaders.acceptHeader] = 'image/*';
     }
 
     http.Response response;

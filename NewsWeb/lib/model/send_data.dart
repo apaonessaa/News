@@ -25,7 +25,7 @@ class SendData
 
         var request = http.MultipartRequest(
             'POST',
-            Uri.parse('${Endpoints.SERVER}${Endpoints.ARTICLE}')
+            Uri.parse('${Endpoints.PROTECTED_API}${Endpoints.ARTICLE}')
             )
             ..files.add(
                 http.MultipartFile.fromBytes(
@@ -74,7 +74,7 @@ class SendData
 
         var request = http.MultipartRequest(
             'PUT',
-            Uri.parse('${Endpoints.SERVER}${Endpoints.article(art.title)}')
+            Uri.parse('${Endpoints.PROTECTED_API}${Endpoints.article(art.title)}')
         )
         ..files.add(
             http.MultipartFile.fromBytes(
@@ -119,7 +119,7 @@ class SendData
         try {
             dynamic response = await Service.request(
                 HttpMethod.DELETE,
-                Endpoints.SERVER,
+                Endpoints.PROTECTED_API,
                 Endpoints.article(title)
             );
             print("Articolo eliminato.");
