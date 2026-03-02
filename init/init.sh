@@ -2,7 +2,7 @@
 
 OAUTH2=$1
 
-CATEGORY_ENDPOINT='http://localhost:8080/api/categories'
+CATEGORY_ENDPOINT='http://localhost:8080/protected/api/categories'
 FILE_TO_READ="$PWD/init.json"
 
 if [ ! -f "$FILE_TO_READ" ]; then
@@ -20,7 +20,7 @@ while IFS=$'\n' read -r cat; do
     # Create Category
     curl -s "$CATEGORY_ENDPOINT" \
         -X POST \
-        --header "_oauth2_proxy: $OAUTH2" \
+        --cookie "_oauth2_proxy=$OAUTH2" \
 	--header 'Content-Type: application/json' \
         -d @- <<EOF 
 {"name": "$cat","description": "$cat_descr","subcategories": []}
@@ -38,7 +38,7 @@ EOF
         # Create Subcategory
         curl -s "$CATEGORY_ENDPOINT/$cat/subcategories" \
             -X POST \
-            --header "_oauth2_proxy: $OAUTH2" \
+            --cookie "news_cookie=$OAUTH2" \
             --header 'Content-Type: application/json' \
             -d @- <<EOF 
 {"name": "$subcat","description": "$subcat_descr", "category": "$cat", "articles": []}
