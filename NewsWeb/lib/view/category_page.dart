@@ -44,6 +44,26 @@ class _CategoryPage extends State<CategoryPage>
     _loadArticles();
   }
 
+
+  @override
+  void dispose() {
+    articles.clear();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {
+      isLoading = true;
+      isLoadingCategory = true;
+      articles = [];
+    });
+    articles = [];
+    _loadCategory();
+    _loadArticles();
+  }
+
   Future<void> _loadCategory() async 
   {
     try {
@@ -104,42 +124,29 @@ class _CategoryPage extends State<CategoryPage>
   }
 
   @override
-  void dispose() {
-    articles.clear();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     double maxWidth = UtilsLayout.setWidth(context);
+    List<Widget> actions = [
+      Util.btn(
+        Icons.home,
+        'Home',
+        () {
+          Navigator.of(context).pop();
+          context.go('/');
+        },
+      ),
+    ];
+
     if (isLoadingCategory) {
       return CustomPage(
-        actions: [
-          Util.btn(
-            Icons.webhook,
-            'Home',
-            () {
-              Navigator.of(context).pop();
-              context.go('/');
-            },
-          ),
-        ],
+        actions: actions,
         content: [Util.isLoading()],
       );
     }
 
     if (hasErrorCategory) {
       return CustomPage(
-        actions: [
-          Util.btn(
-            Icons.webhook,
-            'Home',
-            () {
-              Navigator.of(context).pop();
-              context.go('/');
-            },
-          ),
-        ],
+        actions: actions,
         content: [
           UtilsLayout.layout(
             [Util.error("Errore nel caricamento della categoria.")],
@@ -153,16 +160,7 @@ class _CategoryPage extends State<CategoryPage>
     }
 
     return CustomPage(
-      actions: [
-        Util.btn(
-          Icons.webhook,
-          'Home',
-          () {
-            Navigator.of(context).pop();
-            context.go('/');
-          },
-        ),
-      ],
+      actions: actions,
       content: [
         Column(
           mainAxisAlignment: MainAxisAlignment.start,

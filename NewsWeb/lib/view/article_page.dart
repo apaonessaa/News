@@ -53,36 +53,37 @@ class _ArticlePage extends State<ArticlePage>
     }
 
     @override
+    void didChangeDependencies() {
+        super.didChangeDependencies();
+        setState(() {
+            isLoading = true;
+        });
+        getArticle();
+    }
+
+    @override
     Widget build(BuildContext context) {
         double maxWidth = UtilsLayout.setWidth(context);
+        List<Widget> actions = [
+            Util.btn(
+                Icons.home,
+                'Home',
+                () {
+                Navigator.of(context).pop();
+                context.go('/');
+                },
+            ),
+        ];
         if (isLoading) {
             return CustomPage(
-                actions: [
-                    Util.btn(
-                        Icons.webhook,
-                        'Home',
-                        () {
-                            Navigator.of(context).pop();
-                            context.go('/'); 
-                        },
-                    ),
-                ],
+                actions: actions,
                 content: [Util.isLoading()],
             );
         }
 
         if (hasError) {
             return CustomPage(
-                actions: [
-                    Util.btn(
-                        Icons.webhook,
-                        'Home',
-                        () {
-                            Navigator.of(context).pop();
-                            context.go('/');
-                        },
-                    ),
-                ],
+                actions: actions,
                 content: [
                     UtilsLayout.layout(
                         [ Util.error("Errore nel caricamento dell'articolo.") ], 
@@ -96,16 +97,7 @@ class _ArticlePage extends State<ArticlePage>
         }
 
         return CustomPage(
-            actions: [
-                Util.btn(
-                    Icons.webhook,
-                    'Home',
-                    () {
-                        Navigator.of(context).pop();
-                        context.go('/');
-                    },
-                ),
-            ],
+            actions: actions,
             content: [
                 UtilsLayout.layout(_build(context), maxWidth),
                 const SizedBox(height: 100),

@@ -11,6 +11,7 @@ networks:
 services:
   # === Server ===
   database:
+    container_name: news-database
     image: mysql:latest
     volumes:
       - data-server:/var/lib/mysql
@@ -34,6 +35,7 @@ services:
 
   server:
     build: NewsAPI
+    container_name: news-server
     volumes:
       - data-images:/home/spring/images
     environment:
@@ -58,42 +60,52 @@ services:
 
   # === AI ===
   classifier:
-    build: NewsAI/Classifier
-    environment:
-      - HF_TOKEN=${CLASSIFIER_TOKEN}
-      - HF_API=${CLASSIFIER_API}
+    container_name: news-classifier
+    build: 
+      context: NewsAI/Classifier
+      args:
+        - HF_TOKEN=${CLASSIFIER_TOKEN}
+        - HF_API=${CLASSIFIER_API}
     expose:
       - 8000
     networks:
       microservices:
         aliases:
           - news.classifier
-    healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8000; echo -e 'GET /health HTTP/1.1\r\nHost: localhost:8000\r\nConnection: close\r\n\r\n' >&3;cat <&3 | grep -q 'UP' && exit 0 || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 3
 
   corrector:
-    build: NewsAI/Corrector
-    environment:
-      - HF_TOKEN=${CORRECTOR_TOKEN}
-      - HF_API=${CORRECTOR_API}
-      - HF_MODEL=${CORRECTOR_MODEL}
+    container_name: news-corrector
+    build: 
+      context: NewsAI/Corrector
+      args:
+        - HF_TOKEN=${CORRECTOR_TOKEN}
+        - HF_API=${CORRECTOR_API}
+        - HF_MODEL=${CORRECTOR_MODEL}
     expose:
       - 8000
     networks:
       microservices:
         aliases:
           - news.corrector
-    healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8000; echo -e 'GET /health HTTP/1.1\r\nHost: localhost:8000\r\nConnection: close\r\n\r\n' >&3;cat <&3 | grep -q 'UP' && exit 0 || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 3
+
+  summarizer:
+    container_name: news-summarizer
+    build: 
+      context: NewsAI/Summarizer
+      args:
+        - HF_TOKEN=${SUMMARIZER_TOKEN}
+        - HF_API=${SUMMARIZER_API}
+        - HF_MODEL=${SUMMARIZER_MODEL}
+    expose:
+      - 8000
+    networks:
+      microservices:
+        aliases:
+          - news.summarizer
 
   # === Authentication ===
   keycloak:
+    container_name: news-oidc
     image: quay.io/keycloak/keycloak:latest
     volumes:
       - ./NewsAuth/export:/opt/keycloak/data/import/:ro
@@ -133,6 +145,7 @@ services:
       retries: 3
 
   oauth2-proxy:
+    container_name: news-oauth2-proxy
     image: quay.io/oauth2-proxy/oauth2-proxy:latest
     environment:
       - OAUTH2_PROXY_CLIENT_ID=news-keycloak-client
@@ -165,6 +178,7 @@ services:
 
   # === Reverse proxy ===
   api-gateway:
+    container_name: news-api-gateway
     image: nginx:latest
     volumes:
       - ./NewsProxy/nginx.conf:/etc/nginx/nginx.conf:ro
@@ -179,15 +193,18 @@ services:
     depends_on:
       oauth2-proxy: { condition: service_started }
       server: { condition: service_healthy }
-      #classifier: { condition: service_healthy }
-      #corrector: { condition: service_healthy }
+      classifier: { condition: service_started }
+      corrector: { condition: service_started }
+      summarizer: { condition: service_started }
 
   # === Web app ===
   web-app:
+    container_name: news-webapp
     build:
       context: NewsWeb
       args:
-        - SERVICE_DOMAIN=localhost:8080
+        - HOST=localhost:3000
+        - SERVICE=localhost:8080
     ports:
       - 3000:80
     expose:

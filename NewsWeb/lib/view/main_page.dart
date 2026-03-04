@@ -28,11 +28,41 @@ class _MainPage extends State<MainPage>
   int pageSize = 17;
   int maxPageNumber = 0;
 
+  bool loggedIn = false;
+
   @override
   void initState() {
     super.initState();
     articles = [];
     _loadArticles();
+    checkAccess();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {
+      loggedIn=false;
+      isLoading = true;
+      articles = [];
+    });
+    _loadArticles();
+    checkAccess();
+  }
+
+  @override
+  void dispose() {
+    articles.clear();
+    super.dispose();
+  }
+
+  Future<void> checkAccess() async {
+    final result = await AuthService.sharedInstance.checkAccess();
+    if (mounted) {
+      setState(() {
+        loggedIn = result;
+      });
+    }
   }
 
   Future<void> _loadArticles() async 
@@ -56,42 +86,37 @@ class _MainPage extends State<MainPage>
   }
 
   @override
-  void dispose() {
-    articles.clear();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     double maxWidth = UtilsLayout.setWidth(context);
+    List<Widget> actions = [
+      if (loggedIn)
+        Util.btn(
+          Icons.account_circle,
+          'Admin',
+          () {
+            Navigator.of(context).pop();
+            context.go('/admin');
+          },
+        )
+      else
+        Util.btn(
+          Icons.logout,
+            'Login',
+            () async {
+              await AuthService.sharedInstance.login();
+          },
+        ),
+    ];
     if (isLoading) {
       return CustomPage(
-        actions: [
-          Util.btn(
-            Icons.webhook,
-            'Home',
-            () {
-              //Navigator.of(context).pop();
-              context.go('/');
-            },
-          ),
-        ],
+        actions: actions,
         content: [Util.isLoading()],
       );
     }
 
     if (hasError) {
       return CustomPage(
-        actions: [
-          Util.btn(
-            Icons.webhook,
-            'Home',
-            () {
-              //Navigator.of(context).pop();
-              context.go('/');
-            },
-          ),
-        ],
+        actions: actions,
         content: [
           UtilsLayout.layout(
             [ Util.error("Errore nel caricamento dell'articolo.") ], 
@@ -105,16 +130,7 @@ class _MainPage extends State<MainPage>
     }
 
     return CustomPage(
-      actions: [
-        Util.btn(
-          Icons.webhook,
-          'Home',
-          () {
-            //Navigator.of(context).pop();
-            context.go('/');
-          },
-        ),
-      ],
+      actions: actions,
       content: [
         UtilsLayout.layout(_build(context), maxWidth),
         const SizedBox(height: 100),

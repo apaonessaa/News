@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:newsweb/model/auth_service.dart';
 import 'package:newsweb/model/retrive_data.dart';
 import 'package:newsweb/model/send_data.dart';
 import 'package:newsweb/model/entity/article.dart';
@@ -47,6 +48,8 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
 
     bool isSaving = false;
     bool isDeleting = false;
+    bool loggedIn = false;
+    bool isLoadingLogin = true;
 
     @override
     void initState() 
@@ -56,6 +59,7 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
         _bodyController = quill.QuillController.basic(); 
         _loadCategories();
         _loadArticle();
+        checkAccess();
     }
 
     @override
@@ -63,7 +67,38 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
     {
         _abstractController.dispose();
         _bodyController.dispose();
+        loggedIn=false;
         super.dispose();
+    }
+
+    @override
+    void didChangeDependencies() {
+        super.didChangeDependencies();
+        setState(() {
+            loggedIn=false;
+            isLoadingCategory = true;
+            categories = [];
+            _abstractController = quill.QuillController.basic(); 
+            _bodyController = quill.QuillController.basic(); 
+        });
+        
+        _loadCategories();
+        checkAccess();
+    }
+
+    Future<void> checkAccess() async {
+        setState(() {
+            isLoadingLogin = true;
+        });
+        final result = await AuthService.sharedInstance.checkAccess();
+        if (mounted) {
+            setState(() {
+                loggedIn = result;
+            });
+        }
+        setState(() {
+            isLoadingLogin = false;
+        });
     }
 
     void _loadArticle() async 
@@ -256,6 +291,14 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
     @override
     Widget build(BuildContext context) 
     {
+        if (isLoadingLogin) {
+            return Util.isLoading();
+        }
+
+        if (!loggedIn) {
+            return Util.error("Errore.");
+        }
+
         return CustomPage(
             actions: [
                 Util.btn(

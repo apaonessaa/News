@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:newsweb/model/auth_service.dart';
 import 'package:newsweb/model/retrive_data.dart';
 import 'package:newsweb/model/send_data.dart';
 import 'package:newsweb/model/entity/article.dart';
@@ -44,6 +45,8 @@ class _ArticleFormPage extends State<ArticleFormPage>
     bool isLoadingSummary = false;
     bool isLoadingBody = false;
     bool isLoadingSelectedCategory = false;
+    bool loggedIn = false;
+    bool isLoadingLogin = true;
 
     @override
     void initState() 
@@ -53,6 +56,7 @@ class _ArticleFormPage extends State<ArticleFormPage>
         _abstractController = quill.QuillController.basic(); 
         _bodyController = quill.QuillController.basic(); 
         _loadCategories();
+        checkAccess();
     }
 
     @override
@@ -62,6 +66,37 @@ class _ArticleFormPage extends State<ArticleFormPage>
         _abstractController.dispose();
         _bodyController.dispose();
         super.dispose();
+    }
+
+    @override
+    void didChangeDependencies() {
+        super.didChangeDependencies();
+        setState(() {
+            loggedIn=false;
+            isLoadingCategory = true;
+            categories = [];
+            _titleController = quill.QuillController.basic();
+            _abstractController = quill.QuillController.basic(); 
+            _bodyController = quill.QuillController.basic(); 
+        });
+        
+        _loadCategories();
+        checkAccess();
+    }
+
+    Future<void> checkAccess() async {
+        setState(() {
+            isLoadingLogin = true;
+        });
+        final result = await AuthService.sharedInstance.checkAccess();
+        if (mounted) {
+            setState(() {
+                loggedIn = result;
+            });
+        }
+        setState(() {
+            isLoadingLogin = false;
+        });
     }
 
     void _loadCategories() async 
@@ -256,20 +291,47 @@ class _ArticleFormPage extends State<ArticleFormPage>
         }
     }
 
+    void summarizer() async {
+        final selection = _bodyController.selection;
+        final textToSummarize = _bodyController.document.getPlainText(
+            selection.start, 
+            selection.extentOffset
+        );
+
+        if (textToSummarize.trim().isEmpty) {
+            Util.notify(context, "Seleziona il testo da sintetizzare.", true);
+            return;
+        }
+
+        try {
+            final result = await RetriveData.sharedInstance.summarizer(textToSummarize);
+            final currentAbstractLength = _abstractController.document.length;
+
+            _abstractController.replaceText(0, currentAbstractLength - 1, result, null);
+
+            setState(() {
+                Util.notify(context, "Sintesi generata con successo.", false);
+            });
+        } catch (e) {
+            setState(() {
+                Util.notify(context, "Errore nella generazione della sintesi.", true);
+            });
+        }
+    }
+
     @override
     Widget build(BuildContext context) 
     {
+        if (isLoadingLogin) {
+            return Util.isLoading();
+        }
+
+        if (!loggedIn) {
+            return Util.error("Errore.");
+        }
+
         return CustomPage(
-            actions: [
-                Util.btn(
-                    Icons.home,
-                    'Home',
-                    () {
-                        Navigator.of(context).pop();
-                        context.go('/');
-                    },
-                ),
-            ],
+            actions: [],
             content: [
                 const SizedBox(height: 40.0),
                 if (isLoadingCategory || isSaving)
@@ -362,7 +424,7 @@ class _ArticleFormPage extends State<ArticleFormPage>
                         multiRowsDisplay: true,
                         customButtons: [
                             quill.QuillToolbarCustomButtonOptions(
-                                icon: Icon(Icons.spellcheck, color: Colors.blue),
+                                icon: Icon(Icons.spellcheck, color: Colors.red[600]),
                                 onPressed: () {
                                     setState(() {
                                         isLoadingSummary = true;
@@ -444,7 +506,22 @@ class _ArticleFormPage extends State<ArticleFormPage>
                         multiRowsDisplay: false,
                         customButtons: [
                             quill.QuillToolbarCustomButtonOptions(
-                                icon: Icon(Icons.spellcheck, color: Colors.blue),
+                                icon: Icon(Icons.summarize, color: Colors.red[600]),
+                                onPressed: () {
+                                    setState(() {
+                                        isLoadingSummary=true;
+                                    });
+
+                                    summarizer();
+
+                                    setState(() {
+                                        isLoadingSummary=false;
+                                    });
+                                },
+                                tooltip: 'Generazione di un abstract con AI.',
+                            ),
+                            quill.QuillToolbarCustomButtonOptions(
+                                icon: Icon(Icons.spellcheck, color: Colors.red[600]),
                                 onPressed: () {
                                     setState(() {
                                         isLoadingBody = true;
@@ -459,7 +536,7 @@ class _ArticleFormPage extends State<ArticleFormPage>
                                 tooltip: 'Correzione del testo con AI.',
                             ),
                             quill.QuillToolbarCustomButtonOptions(
-                                icon: Icon(Icons.category_rounded, color: Colors.blue),
+                                icon: Icon(Icons.generating_tokens, color: Colors.red[600]),
                                 onPressed: () {
                                     setState(() {
                                         isLoadingSelectedCategory=true;

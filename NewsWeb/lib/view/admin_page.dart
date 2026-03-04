@@ -30,13 +30,45 @@ class _AdminPage extends State<AdminPage>
     int pageSize = 6;
     int maxPageNumber = 0;
 
+    bool loggedIn=false;
+
     @override
     void initState() 
     {
         super.initState();
+        checkAccess();
         _loadUser();
         articles = [];
         _loadArticles();
+    }
+
+    @override
+    void dispose() {
+        articles.clear();
+        super.dispose();
+    }
+
+    @override
+    void didChangeDependencies() {
+        super.didChangeDependencies();
+        setState(() {
+            loggedIn=false;
+            isLoading = true;
+            isLoadingUser = true;
+            articles = [];
+        });
+        checkAccess();
+        _loadUser();
+        _loadArticles();
+    }
+
+    Future<void> checkAccess() async {
+        final result = await AuthService.sharedInstance.checkAccess();
+        if (mounted) {
+            setState(() {
+                loggedIn = result;
+            });
+        }
     }
 
     Future<void> _loadUser() async 
@@ -99,14 +131,12 @@ class _AdminPage extends State<AdminPage>
     }
 
     @override
-    void dispose() {
-        articles.clear();
-        super.dispose();
-    }
-
-    @override
     Widget build(BuildContext context) 
     {
+        if (!loggedIn) {
+            return Util.error("Errore con il caricamento del profilo.");
+        }
+
         if(isLoadingUser)
             return Util.isLoading();
         if (hasError)
@@ -116,7 +146,7 @@ class _AdminPage extends State<AdminPage>
         return CustomPage(
             actions: [
                 Util.btn(
-                    Icons.webhook,
+                    Icons.home,
                     'Home',
                     () {
                         Navigator.of(context).pop();
@@ -133,7 +163,17 @@ class _AdminPage extends State<AdminPage>
             ],
             content: [
                 const SizedBox(height: 40.0),
-                Text("Bentornato ${user!.username}!"),
+                Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                    Text("Bentornato ${user!.username}!",
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.start,
+                    ),
+                ]),
                 const SizedBox(width: 16), 
                 UtilsLayout.layout(_build(context), maxWidth),
                 const SizedBox(height: 100),

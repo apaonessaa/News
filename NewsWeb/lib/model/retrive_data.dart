@@ -20,6 +20,7 @@ class RetriveData
                 Endpoints.CORRECTOR,
                 '', 
                 body: body,
+                includeCredentials: true
             );
 
             if (response != null && response['result'] != null) {
@@ -42,6 +43,30 @@ class RetriveData
                 Endpoints.CLASSIFIER,
                 '', 
                 body: body,
+                includeCredentials: true
+            );
+
+            if (response != null && response['result'] != null) {
+                return response['result'];
+            } else {
+                throw Exception('Risultato non presente nella risposta');
+            }
+        } catch (error) {
+            throw Exception('Errore nella richiesta di correzione: $error');
+        }
+    }
+
+    Future<String> summarizer(String text) async 
+    {
+        final body = { 'text': text, };
+
+        try {
+            dynamic response = await Service.request(
+                HttpMethod.POST,
+                Endpoints.SUMMARIZER,
+                '', 
+                body: body,
+                includeCredentials: true
             );
 
             if (response != null && response['result'] != null) {

@@ -27,8 +27,9 @@ COPY ./lib ./lib
 COPY ./pubspec.yaml ./pubspec.yaml
 RUN flutter clean && flutter pub get
 
-ARG SERVICE_DOMAIN
-RUN flutter build web --dart-define=SERVICE_DOMAIN=${SERVICE_DOMAIN} --no-pub --release --no-wasm-dry-run --no-tree-shake-icons -O4 -o /tmp/web
+ARG HOST
+ARG SERVICE
+RUN flutter build web --dart-define=HOST=${HOST} --dart-define=SERVICE=${SERVICE} --no-pub --release --no-wasm-dry-run --no-tree-shake-icons -O4 -o /tmp/web
 
 # === Service ===
 FROM nginx:alpine
