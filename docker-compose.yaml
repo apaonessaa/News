@@ -49,8 +49,7 @@ services:
         aliases:
           - news.server
     depends_on:
-      database:
-        condition: service_healthy
+      database: { condition: service_healthy } 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/actuator/health"]
       start_period: 15s
@@ -215,3 +214,20 @@ services:
           - news.web
     depends_on:
       api-gateway: { condition: service_started }
+
+  # === Worker ===
+  populate-news:
+    image: alpine:latest
+    container_name: worker-server-init
+    volumes:
+      - ./scripts/init.sh:/init.sh:ro
+      - ./scripts/data/:/data/:ro
+    entrypoint: >
+      /bin/sh -c "
+      apk update && apk add --no-cache curl jq || true;
+      /bin/sh /init.sh news.server:8000
+      "
+    networks:
+      - microservices
+    depends_on:
+      server: { condition: service_healthy }
