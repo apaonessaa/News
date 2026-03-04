@@ -1,131 +1,133 @@
-import 'dart:typed_data';
-import 'package:mime/mime.dart';
 import 'dart:convert';
-import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:newsweb/model/service.dart';
+import 'dart:typed_data';
+import 'dart:js_interop'; 
+import 'package:mime/mime.dart';
+import 'package:web/web.dart' show FormData, Blob, BlobPropertyBag; 
+import 'package:fetch_api/fetch_api.dart';
 import 'package:newsweb/model/entity/article.dart';
-import 'package:newsweb/model/service.dart';
 import 'package:newsweb/model/endpoints.dart';
 
-class SendData 
-{
-    static SendData sharedInstance = SendData();
+class SendData {
+  static SendData sharedInstance = SendData();
 
-    Future<void> save(
-        Article art, 
-        Uint8List imageBytes, 
-        String imageFilename) async 
-    {
-        final mimeType = lookupMimeType(imageFilename);
-        String subType = mimeType?.split('/').last ?? 'unknown';
+  String _getSubType(String filename) {
+    final mimeType = lookupMimeType(filename);
+    return mimeType?.split('/').last ?? 'unknown';
+  }
 
-        var articleJson = art.toJson();
+  Future<void> save(Article art, Uint8List imageBytes, String imageFilename) async {
+    final url = '${Endpoints.PROTECTED_API}${Endpoints.ARTICLE}';
 
-        var request = http.MultipartRequest(
-            'POST',
-            Uri.parse('${Endpoints.PROTECTED_API}${Endpoints.ARTICLE}')
-            )
-            ..files.add(
-                http.MultipartFile.fromBytes(
-                'article',
-                utf8.encode(jsonEncode(articleJson)),
-                filename: 'article.json', 
-                contentType: MediaType('application', 'json'),
-                ),
-            )
-            ..files.add(
-                http.MultipartFile.fromBytes(
-                'image',
-                imageBytes,
-                filename: imageFilename,
-                contentType: MediaType('image', subType),
-                ),
-        );
+    final formData = FormData();
 
-        print(request.headers);
-        
-        try {
-            var response = await request.send();
-            if (response.statusCode == 201) {
-                print("Articolo è stato salvato con successo!");
-            } else {
-                print("Errore nel salvataggio dell'articolo: ${response.statusCode}");
-                var responseBody = await response.stream.bytesToString();
-                print("Risposta dell'errore: $responseBody");
-                throw new Exception();
-            }
-        } catch (e) {
-            print("Errore durante la richiesta HTTP: $e");
-            throw new Exception();
-        }
+    final articleJson = jsonEncode(art.toJson());
+    final articleBlob = Blob([articleJson.toJS].toJS, BlobPropertyBag(type: 'application/json'));
+    formData.append('article', articleBlob, 'article.json');
+
+    final imageBlob = Blob([imageBytes.toJS].toJS, BlobPropertyBag(type: 'image/${_getSubType(imageFilename)}'));
+    formData.append('image', imageBlob, imageFilename);
+
+    try {
+      final RequestInit requestOptions = RequestInit(
+        method: 'POST',
+        headers: null,
+        body: RequestBody.fromFormData(formData),
+        mode: RequestMode.cors,
+        credentials: RequestCredentials.cors,
+        cache: RequestCache.noCache,
+        redirect: RequestRedirect.follow,
+        referrer: "",
+        referrerPolicy: RequestReferrerPolicy.noReferrer,
+        integrity: "",
+        keepalive: false,
+        signal: null,
+        duplex: null,
+      );
+      final response = await fetch(url, requestOptions);
+
+      if (response.status == 201) {
+        print("Articolo salvato con successo!");
+      } else {
+        print("Errore nel salvataggio: ${response.status}");
+        throw Exception();
+      }
+    } catch (e) {
+      print("Errore durante la richiesta fetch: $e");
+      throw Exception();
+    }
+  }
+
+  Future<void> update(Article art, Uint8List? imageBytes, String imageFilename) async {
+    final url = '${Endpoints.PROTECTED_API}${Endpoints.article(art.title)}';
+    final formData = FormData();
+
+    final articleJson = jsonEncode(art.toJson());
+    final articleBlob = Blob([articleJson.toJS].toJS, BlobPropertyBag(type: 'application/json'));
+    formData.append('article', articleBlob, 'article.json');
+
+    if (imageBytes != null && imageBytes.isNotEmpty) {
+      final imageBlob = Blob([imageBytes.toJS].toJS, BlobPropertyBag(type: 'image/${_getSubType(imageFilename)}'));
+      formData.append('image', imageBlob, imageFilename);
     }
 
-    Future<void> update(
-    Article art, 
-    Uint8List? imageBytes, 
-    String imageFilename) async 
-    {
-        final mimeType = lookupMimeType(imageFilename);
-        String subType = mimeType?.split('/').last ?? 'unknown';
+    try {
+      final RequestInit requestOptions = RequestInit(
+        method: 'PUT',
+        headers: null,
+        body: RequestBody.fromFormData(formData),
+        mode: RequestMode.cors,
+        credentials: RequestCredentials.cors,
+        cache: RequestCache.noCache,
+        redirect: RequestRedirect.follow,
+        referrer: "",
+        referrerPolicy: RequestReferrerPolicy.noReferrer,
+        integrity: "",
+        keepalive: false,
+        signal: null,
+        duplex: null,
+      );
+      final response = await fetch(url, requestOptions);
 
-        var articleJson = art.toJson();
-
-        var request = http.MultipartRequest(
-            'PUT',
-            Uri.parse('${Endpoints.PROTECTED_API}${Endpoints.article(art.title)}')
-        )
-        ..files.add(
-            http.MultipartFile.fromBytes(
-                'article',
-                utf8.encode(jsonEncode(articleJson)),
-                filename: 'article.json', 
-                contentType: MediaType('application', 'json'),
-            ),
-        );
-
-        if (imageBytes != null && imageBytes.isNotEmpty) {
-            request.files.add(
-                http.MultipartFile.fromBytes(
-                    'image',
-                    imageBytes,
-                    filename: imageFilename,
-                    contentType: MediaType('image', subType),
-                ),
-            );
-        }
-
-        print(request.headers);
-
-        try {
-            var response = await request.send();
-            if (response.statusCode == 200) {
-                print("Articolo è stato aggiornato con successo!");
-            } else {
-                print("Errore nel salvataggio dell'articolo: ${response.statusCode}");
-                var responseBody = await response.stream.bytesToString();
-                print("Risposta dell'errore: $responseBody");
-                throw new Exception();
-            }
-        } catch (e) {
-            print("Errore durante la richiesta HTTP: $e");
-            throw new Exception();
-        }
+      if (response.status == 200) {
+        print("Articolo aggiornato con successo!");
+      } else {
+        print("Errore nell'aggiornamento: ${response.status}");
+        throw Exception();
+      }
+    } catch (e) {
+      print("Errore durante la richiesta fetch: $e");
+      throw Exception();
     }
+  }
 
-    Future<void> delete(String title) async 
-    {
-        try {
-            dynamic response = await Service.request(
-                HttpMethod.DELETE,
-                Endpoints.PROTECTED_API,
-                Endpoints.article(title)
-            );
-            print("Articolo eliminato.");
-        } catch (error) {
-            print("Errore con l'eliminazione dell'articolo ${title}");
-            throw Exception(error);
-        }
+  Future<void> delete(String title) async {
+    try {
+      final url = '${Endpoints.PROTECTED_API}${Endpoints.article(title)}';
+      final RequestInit requestOptions = RequestInit(
+        method: 'DELETE',
+        headers: null,
+        body: null,
+        mode: RequestMode.cors,
+        credentials: RequestCredentials.cors,
+        cache: RequestCache.noCache,
+        redirect: RequestRedirect.follow,
+        referrer: "",
+        referrerPolicy: RequestReferrerPolicy.noReferrer,
+        integrity: "",
+        keepalive: false,
+        signal: null,
+        duplex: null,
+      );
+      final response = await fetch(url, requestOptions);
+
+      if (response.status == 200 || response.status == 204) {
+        print("Articolo eliminato.");
+      } else {
+        throw Exception("Status code: ${response.status}");
+      }
+    } catch (error) {
+      print("Errore con l'eliminazione dell'articolo $title: $error");
+      throw Exception(error);
     }
+  }
 }

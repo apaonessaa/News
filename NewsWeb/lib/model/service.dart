@@ -44,7 +44,6 @@ class Service {
         method: method.name, 
         headers: headers,
         body: requestBody,
-        // Nota: Qui usiamo i valori predefiniti dell'Enum, non il costruttore
         mode: RequestMode.cors,
         credentials: includeCredentials ? RequestCredentials.cors : RequestCredentials.sameOrigin,
         cache: RequestCache.noCache,

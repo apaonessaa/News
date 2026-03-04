@@ -1,5 +1,6 @@
 volumes:
-  data-server:    
+  data-images:
+  data-server:
 
 networks:
   client-host:
@@ -34,7 +35,7 @@ services:
   server:
     build: NewsAPI
     volumes:
-      - data-server:/home/spring/images
+      - data-images:/home/spring/images
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://news.database:3306/news
       - SPRING_DATASOURCE_USERNAME=${DB_SPRING_USER}
@@ -136,7 +137,7 @@ services:
     environment:
       - OAUTH2_PROXY_CLIENT_ID=news-keycloak-client
       - OAUTH2_PROXY_CLIENT_SECRET=s3OjtEDp4bNaGdorwWyFHHScbL3QcfpB
-      - OAUTH2_PROXY_COOKIE_SECRET=lDuOB9mww3tD2VB2O1xnrgogcJn0-b87xVOeUSATiqM=
+      - OAUTH2_PROXY_COOKIE_SECRET=${COOKIE_SECRET}
       - OAUTH2_PROXY_EMAIL_DOMAINS=*
       - OAUTH2_PROXY_REVERSE_PROXY=true
       - OAUTH2_PROXY_REDIRECT_URL=http://localhost:8080/oauth2/callback
@@ -151,8 +152,8 @@ services:
       - --oidc-issuer-url=http://news-keycloak-alias.127.0.0.1.nip.io:8000/realms/news-keycloak-realm
       - --code-challenge-method=S256
       - --skip-auth-preflight=true
-      - --cookie-expire=15s
-      - --cookie-refresh=10s
+      - --cookie-expire=30m
+      - --cookie-refresh=28m
     depends_on:
       keycloak: { condition: service_healthy }
     expose: 
