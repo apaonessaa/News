@@ -20,8 +20,8 @@ while IFS=$'\n' read -r cat; do
     # Create Category
     curl -s "$CATEGORY_ENDPOINT" \
         -X POST \
-        --cookie "_oauth2_proxy=$OAUTH2" \
-	--header 'Content-Type: application/json' \
+        --cookie "_oauth2_cookie=$OAUTH2" \
+	    --header 'Content-Type: application/json' \
         -d @- <<EOF 
 {"name": "$cat","description": "$cat_descr","subcategories": []}
 EOF
@@ -38,7 +38,7 @@ EOF
         # Create Subcategory
         curl -s "$CATEGORY_ENDPOINT/$cat/subcategories" \
             -X POST \
-            --cookie "news_cookie=$OAUTH2" \
+            --cookie "_oauth2_cookie=$OAUTH2" \
             --header 'Content-Type: application/json' \
             -d @- <<EOF 
 {"name": "$subcat","description": "$subcat_descr", "category": "$cat", "articles": []}

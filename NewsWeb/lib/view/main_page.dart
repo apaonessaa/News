@@ -9,6 +9,7 @@ import 'package:newsweb/view/layout/article_page/one_article.dart';
 import 'package:newsweb/view/layout/article_page/stack_article.dart';
 import 'package:newsweb/view/layout/cat_subcat_footer.dart';
 import 'package:newsweb/view/layout/util.dart';
+import 'package:newsweb/model/auth_service.dart';
 
 class MainPage extends StatefulWidget 
 { 
@@ -17,11 +18,11 @@ class MainPage extends StatefulWidget
 }
 
 class _MainPage extends State<MainPage> 
-{
+{  
   late List<Article> articles;
   bool isLoading = true;
   bool hasError = false;
-
+  
   List<Article> page = [];
   int pageNumber = 0;
   int pageSize = 17;
@@ -113,14 +114,6 @@ class _MainPage extends State<MainPage>
             context.go('/');
           },
         ),
-        Util.btn(
-            Icons.webhook,
-            'Admin',
-            () {
-              Navigator.of(context).pop();
-              context.go('/admin');
-            },
-          ),
       ],
       content: [
         UtilsLayout.layout(_build(context), maxWidth),

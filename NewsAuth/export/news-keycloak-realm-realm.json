@@ -1,7 +1,7 @@
 {
   "id" : "8dd562e6-8e9c-4828-b7b0-8a7ca5ed3375",
   "realm" : "news-keycloak-realm",
-  "displayName" : "",
+  "displayName" : "News Sign-In",
   "displayNameHtml" : "",
   "notBefore" : 0,
   "defaultSignatureAlgorithm" : "RS256",
@@ -532,8 +532,8 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "s3OjtEDp4bNaGdorwWyFHHScbL3QcfpB",
-    "redirectUris" : [ "http://localhost:8080/*" ],
-    "webOrigins" : [ "/*" ],
+    "redirectUris" : [ "http://localhost:8080/oauth2/callback" ],
+    "webOrigins" : [ "http://localhost:8080", "http://localhost:3000" ],
     "notBefore" : 0,
     "bearerOnly" : false,
     "consentRequired" : false,
@@ -545,20 +545,32 @@
     "frontchannelLogout" : true,
     "protocol" : "openid-connect",
     "attributes" : {
-      "logout.confirmation.enabled" : "false",
-      "client.secret.creation.time" : "1772027633",
-      "standard.token.exchange.enabled" : "false",
       "oauth2.jwt.authorization.grant.enabled" : "false",
       "post.logout.redirect.uris" : "+",
-      "frontchannel.logout.session.required" : "true",
+      "frontchannel.logout.session.required" : "false",
       "oauth2.device.authorization.grant.enabled" : "false",
-      "backchannel.logout.revoke.offline.tokens" : "false",
+      "backchannel.logout.revoke.offline.tokens" : "true",
+      "use.refresh.tokens" : "true",
       "realm_client" : "false",
       "oidc.ciba.grant.enabled" : "false",
       "backchannel.logout.session.required" : "true",
-      "display.on.consent.screen" : "false",
+      "backchannel.logout.url" : "http://{KEYCLOAK_DOMAIN}/realms/{REALM_NAME}/protocol/openid-connect/logout/backchannel-logout",
+      "client_credentials.use_refresh_token" : "false",
+      "require.pushed.authorization.requests" : "false",
       "pkce.code.challenge.method" : "S256",
-      "dpop.bound.access.tokens" : "false"
+      "dpop.bound.access.tokens" : "false",
+      "logout.confirmation.enabled" : "true",
+      "id.token.as.detached.signature" : "false",
+      "client.secret.creation.time" : "1772027633",
+      "client.introspection.response.allow.jwt.claim.enabled" : "false",
+      "standard.token.exchange.enabled" : "false",
+      "client.use.lightweight.access.token.enabled" : "false",
+      "request.object.required" : "not required",
+      "access.token.header.type.rfc9068" : "false",
+      "tls.client.certificate.bound.access.tokens" : "false",
+      "acr.loa.map" : "{}",
+      "display.on.consent.screen" : "false",
+      "token.response.type.bearer.lower-case" : "false"
     },
     "authenticationFlowBindingOverrides" : { },
     "fullScopeAllowed" : true,
@@ -1374,7 +1386,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-user-attribute-mapper", "saml-role-list-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper", "oidc-full-name-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-attribute-mapper", "oidc-address-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-usermodel-property-mapper", "saml-user-attribute-mapper", "saml-user-property-mapper", "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-attribute-mapper", "saml-role-list-mapper", "oidc-full-name-mapper" ]
       }
     }, {
       "id" : "8c1473ab-454a-4aef-83bc-c3230619a4e2",
@@ -1390,7 +1402,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-usermodel-property-mapper", "oidc-full-name-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "saml-role-list-mapper", "saml-user-attribute-mapper", "saml-user-property-mapper" ]
+        "allowed-protocol-mapper-types" : [ "saml-role-list-mapper", "oidc-usermodel-property-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper", "oidc-full-name-mapper", "saml-user-attribute-mapper" ]
       }
     }, {
       "id" : "defa77c9-6734-4c78-a0ec-bc7368f306cc",

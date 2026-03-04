@@ -1,70 +1,78 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:http/http.dart' as http;
+import 'package:fetch_api/fetch_api.dart';
 
 enum HttpMethod { POST, GET, PUT, DELETE }
 enum TypeHeader { JSON, URL_ENCODED, IMAGE }
 
-class Service 
-{
+class Service {
   static Future<dynamic> request(
-      HttpMethod method,
-      String serverAddress,
-      String servicePath, {
-        TypeHeader? type,
-        Map<String, String>? params,
-        dynamic body,
-      }) async {
-    Uri uri = Uri.parse(serverAddress).resolve(servicePath).replace(queryParameters: params);
-
-    Map<String, String> headers = {};
-    dynamic requestBody;
-
-    // Gestione della richiesta per diversi tipi di contenuto
-    if (type == null || type == TypeHeader.JSON) {
-      headers[HttpHeaders.contentTypeHeader] = 'application/json;charset=utf-8';
-      requestBody = json.encode(body);
-    } else if (type == TypeHeader.URL_ENCODED) {
-      headers[HttpHeaders.contentTypeHeader] = 'application/x-www-form-urlencoded';
-      requestBody = body?.keys.map((key) => "$key=${Uri.encodeComponent(body[key])}").join("&");
-    } else if (type == TypeHeader.IMAGE) {
-      headers[HttpHeaders.acceptHeader] = 'image/*';
+    HttpMethod method,
+    String serverAddress,
+    String servicePath, {
+    TypeHeader? type,
+    Map<String, String>? params,
+    dynamic body,
+    bool includeCredentials = false, 
+  }) async {
+    // 1. Gestione URI
+    Uri uri = Uri.parse(serverAddress).resolve(servicePath);
+    if (params != null && params.isNotEmpty) {
+      uri = uri.replace(queryParameters: params);
     }
 
-    http.Response response;
+    // 2. Preparazione Headers (Usando l'oggetto Headers richiesto dalla lib)
+    final headers = Headers();
+    dynamic requestBody;
+
+    if (type == null || type == TypeHeader.JSON) {
+      headers.set('Content-Type', 'application/json; charset=utf-8');
+      requestBody = body != null ? json.encode(body) : null;
+    } else if (type == TypeHeader.URL_ENCODED) {
+      headers.set('Content-Type', 'application/x-www-form-urlencoded');
+      if (body is Map) {
+        requestBody = body.entries
+            .map((e) => "${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value.toString())}")
+            .join("&");
+      }
+    } else if (type == TypeHeader.IMAGE) {
+      headers.set('Accept', 'image/*');
+    }
 
     try {
-      switch (method) {
-        case HttpMethod.POST:
-          response = await http.post(uri, headers: headers, body: requestBody);
-          break;
-        case HttpMethod.PUT:
-          response = await http.put(uri, headers: headers, body: requestBody);
-          break;
-        case HttpMethod.GET:
-          response = await http.get(uri, headers: headers);
-          break;
-        case HttpMethod.DELETE:
-          response = await http.delete(uri, headers: headers);
-          break;
-        default:
-          throw Exception('Unsupported HTTP method $method');
-      }
+      // 3. Configurazione RequestInit usando i valori corretti degli Enum
+      final requestOptions = RequestInit(
+        method: method.name, 
+        headers: headers,
+        body: requestBody,
+        // Nota: Qui usiamo i valori predefiniti dell'Enum, non il costruttore
+        mode: RequestMode.cors,
+        credentials: includeCredentials ? RequestCredentials.cors : RequestCredentials.sameOrigin,
+        cache: RequestCache.noCache,
+        redirect: RequestRedirect.follow, 
+        referrer: "", 
+        referrerPolicy: RequestReferrerPolicy.noReferrer, 
+        integrity: "", 
+        keepalive: false, 
+        signal: null, 
+        duplex: null, 
+      );
 
-      if (response.statusCode == HttpStatus.ok || 
-          response.statusCode == HttpStatus.found ||
-          response.statusCode == HttpStatus.noContent) {
+      final response = await fetch(uri.toString(), requestOptions);
 
+      if (response.ok || response.status == 202 || response.status == 302 || response.status == 204) {
+        
         if (type == TypeHeader.IMAGE) {
-          return response.bodyBytes;
+          final arrayBuffer = await response.arrayBuffer();
+          return arrayBuffer.asUint8List();
         }
 
-        return response.body.isEmpty ? null : jsonDecode(response.body);
+        final text = await response.text();
+        return (text.isEmpty) ? null : jsonDecode(text);
       } else {
-        throw Exception('Failed request with status code: ${response.statusCode}');
+        throw Exception('Failed request with status code: ${response.status}');
       }
     } catch (e) {
-      throw Exception('HTTP request error: $e');
+      throw Exception('Fetch request error: $e');
     }
   }
 }

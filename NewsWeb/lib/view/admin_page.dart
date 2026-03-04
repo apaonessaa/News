@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:go_router/go_router.dart';
+import 'package:newsweb/model/auth_service.dart';
 import 'package:newsweb/model/retrive_data.dart';
 import 'package:newsweb/model/entity/article.dart';
 import 'package:newsweb/view/layout/custom_page.dart';
@@ -15,6 +17,10 @@ class AdminPage extends StatefulWidget
 
 class _AdminPage extends State<AdminPage> 
 {
+    User? user;
+    bool isLoadingUser = true;
+    bool hasErrorUser = false;
+
     late List<Article> articles;
     bool isLoading = true;
     bool hasError = false;
@@ -28,8 +34,27 @@ class _AdminPage extends State<AdminPage>
     void initState() 
     {
         super.initState();
+        _loadUser();
         articles = [];
         _loadArticles();
+    }
+
+    Future<void> _loadUser() async 
+    {
+        try {
+            final result = await AuthService.sharedInstance.getUserInfo();
+            setState(() {
+                if (result != null) {
+                    user = result;
+                }
+                isLoadingUser = false;
+            });
+            } catch (error) {
+                setState(() {
+                isLoadingUser = false;
+                hasErrorUser = true;
+            });
+        }
     }
 
     Future<void> _loadArticles() async 
@@ -82,6 +107,11 @@ class _AdminPage extends State<AdminPage>
     @override
     Widget build(BuildContext context) 
     {
+        if(isLoadingUser)
+            return Util.isLoading();
+        if (hasError)
+            return Util.error("Errore con il caricamento del profilo.");
+
         double maxWidth = UtilsLayout.setWidth(context);
         return CustomPage(
             actions: [
@@ -93,9 +123,18 @@ class _AdminPage extends State<AdminPage>
                         context.go('/');
                     }
                 ),
+                Util.btn(
+                    Icons.logout,
+                    'Logout',
+                    () async {
+                        await AuthService.sharedInstance.logout();
+                    },
+                ),
             ],
             content: [
                 const SizedBox(height: 40.0),
+                Text("Bentornato ${user!.username}!"),
+                const SizedBox(width: 16), 
                 UtilsLayout.layout(_build(context), maxWidth),
                 const SizedBox(height: 100),
                 const SizedBox.shrink(),

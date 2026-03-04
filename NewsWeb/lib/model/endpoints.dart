@@ -4,12 +4,12 @@ class Endpoints
 
     static String LOGIN = "http://$SERVICE_DOMAIN/oauth2/sign_in";
     static String LOGOUT = "http://$SERVICE_DOMAIN/oauth2/sign_out";
+    static String CHECK_ACCESS = "http://$SERVICE_DOMAIN/oauth2/auth";
     static String USER_INFO = "http://$SERVICE_DOMAIN/oauth2/userinfo";
-
     static String PUBLIC_API = "http://$SERVICE_DOMAIN/public/api/";
-    static String PROTECTED_API = "http://$SERVICE_DOMAIN/protected/api/";
-    static String CLASSIFIER = "http://$SERVICE_DOMAIN/protected/ai/classifier";
-    static String CORRECTOR = "http://$SERVICE_DOMAIN/protected/ai/corrector";
+    static String PROTECTED_API = "http://$SERVICE_DOMAIN/api/";
+    static String CLASSIFIER = "http://$SERVICE_DOMAIN/ai/classifier";
+    static String CORRECTOR = "http://$SERVICE_DOMAIN/ai/corrector";
 
     static const String ARTICLE = "articles";
 

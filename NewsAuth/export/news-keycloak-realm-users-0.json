@@ -21,7 +21,7 @@
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
     "realmRoles" : [ "default-roles-news-keycloak-realm" ],
-    "notBefore" : 0,
+    "notBefore" : 1772591285,
     "groups" : [ ]
   } ]
 }
