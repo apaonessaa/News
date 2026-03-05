@@ -198,44 +198,12 @@ class _AdminPage extends State<AdminPage>
                             context.go('/admin/article');
                         },
                         style: ElevatedButton.styleFrom(
+				backgroundColor: Colors.black,
+				foregroundColor: Colors.white,
                             padding: EdgeInsets.zero,
                             textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                         ),
                         child: const Text('Nuovo articolo'),
-                        ),
-                    ),
-
-                    const SizedBox(width: 16), 
-
-                    SizedBox(
-                        width: 120,
-                        height: 35,
-                        child: ElevatedButton(
-                        onPressed: (){},
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.zero,
-                                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
-                            child: const Text('Modifica categoria'),
-                        ),
-                    ),
-
-                    const SizedBox(width: 16), 
-
-                    SizedBox(
-                        width: 120,
-                        height: 35,
-                        child: ElevatedButton(
-                        onPressed: (){},
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.zero,
-                                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
-                            child: const Text('Modifica sotto-categoria'),
                         ),
                     ),
                 ],
