@@ -38,7 +38,6 @@ public class ImageService implements IService<Image, String>
         if(imgrepo.findByFilename(fname).isPresent())
             throw new CreateException("The image <"+fname+"> exists.");
         Image img = new Image(fname);
-        img.setArticle(null);
         return imgrepo.save(img);
     }
 

@@ -16,8 +16,8 @@ public class Image
     @Getter
     private String filename;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="artID")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name="artID", referencedColumnName = "artID")
     @Getter @Setter
     private Article article;
 

@@ -5,12 +5,12 @@
 			"jpg": {
         			"mime_type": "image/jpeg",
         			"magic_bytes": "FFD8",
-        			"max_size": "200000"
+        			"max_size": "900000"
         		},
       			"png": {
         			"mime_type": "image/png",
         			"magic_bytes": "89504E470D0A1A0A",
-        			"max_size": "200000"
+        			"max_size": "900000"
       			}	
 		}
 	},

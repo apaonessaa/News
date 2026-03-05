@@ -22,12 +22,12 @@ public class SecurityConfig
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
     {
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(AbstractHttpConfigurer::disable)
-            .httpBasic(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+                .csrf(AbstractHttpConfigurer::disable)
+		.cors(AbstractHttpConfigurer::disable)
+		.httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 	
-	    return http.build();
+	return http.build();
     }
 }

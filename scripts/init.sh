@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Ensure a server address is provided
 if [ -z "$1" ]; then
     echo "Usage: $0 <server_address>"
     exit 1

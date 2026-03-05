@@ -50,6 +50,9 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
     bool isDeleting = false;
     bool loggedIn = false;
     bool isLoadingLogin = true;
+    bool isLoadingSummary = false;
+    bool isLoadingBody = false;
+    bool isLoadingSelectedCategory = false;
 
     @override
     void initState() 
@@ -288,6 +291,97 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
         }
     }
 
+        void corrector(quill.QuillController controller) async
+    {
+        final selection = controller.selection;
+        final textToCorrect = controller.document.getPlainText(selection.start, selection.end);
+
+        if (textToCorrect.isEmpty) {
+            setState(() {
+                Util.notify(context, "Seleziona il testo da correggere.", true);
+            });
+        } else {
+            try {
+                final result = await RetriveData.sharedInstance.corrector(textToCorrect);
+
+                controller.replaceText(selection.start, selection.end - selection.start, result, null);
+                
+                setState(() {
+                    Util.notify(context, "Il testo è stato corretto.", false);
+                });
+            } catch (e) {
+                setState(() {
+                    Util.notify(context, "Errore nella correzione del testo.", true);
+                });
+            }
+        }
+    }
+
+    void classifier(quill.QuillController controller) async
+    {
+        List<String> labels = [];
+
+        if (selectedCategory==null) {
+            labels = categories.map((category) { return category.name; }).toList();
+        } else {
+            labels = selectedCategory!.subcategory;
+        }
+
+        final selection = controller.selection;
+        final textToClassify = controller.document.getPlainText(selection.start, selection.end);
+
+        if (textToClassify.isEmpty) {
+            setState(() {
+                Util.notify(context, "Seleziona il testo da classificare.", true);
+            });
+        } else {
+            try {
+                final result = await RetriveData.sharedInstance.classifier(textToClassify, labels);
+                if (selectedCategory==null) {
+                    selectedCategory = categories.firstWhereOrNull((c) => c.name == result[0]);
+                } else {
+                    selectedSubcategories = result.toSet();
+                }
+                
+                setState(() {
+                    Util.notify(context, "Classificazione del testo avvenuta con successo.", false);
+                });
+            } catch (e) {
+                setState(() {
+                    Util.notify(context, "Errore nella correzione del testo.", true);
+                });
+            }
+        }
+    }
+
+    void summarizer() async {
+        final selection = _bodyController.selection;
+        final textToSummarize = _bodyController.document.getPlainText(
+            selection.start, 
+            selection.extentOffset
+        );
+
+        if (textToSummarize.trim().isEmpty) {
+            Util.notify(context, "Seleziona il testo da sintetizzare.", true);
+            return;
+        }
+
+        try {
+            final result = await RetriveData.sharedInstance.summarizer(textToSummarize);
+            final currentAbstractLength = _abstractController.document.length;
+
+            _abstractController.replaceText(0, currentAbstractLength - 1, result, null);
+
+            setState(() {
+                Util.notify(context, "Sintesi generata con successo.", false);
+            });
+        } catch (e) {
+            setState(() {
+                Util.notify(context, "Errore nella generazione della sintesi.", true);
+            });
+        }
+    }
+
     @override
     Widget build(BuildContext context) 
     {
@@ -369,7 +463,7 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
                 ),
                 child: quill.QuillSimpleToolbar(
                     controller: _abstractController,
-                    config: const quill.QuillSimpleToolbarConfig(
+                    config: quill.QuillSimpleToolbarConfig(
                         showFontFamily: false,
                         showFontSize: false,
                         showBoldButton: true,
@@ -390,28 +484,48 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
                         showSubscript: false,
                         showSuperscript: false,
                         multiRowsDisplay: true,
+                        customButtons: [
+                            quill.QuillToolbarCustomButtonOptions(
+                                icon: Icon(Icons.spellcheck, color: Colors.red[600]),
+                                onPressed: () {
+                                    setState(() {
+                                        isLoadingSummary = true;
+                                    });
+
+                                    corrector(_abstractController);
+
+                                    setState(() {
+                                        isLoadingSummary = false;
+                                    });
+                                },
+                                tooltip: 'Correzione del testo con AI.',
+                            ),
+                        ],
                     ),
                 ),
             ),
-            Container(
-                constraints: const BoxConstraints(minHeight: 100),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
-                    color: Colors.white,
-                ),
-                child: quill.QuillEditor.basic(
-                    controller: _abstractController,
-                    config: const quill.QuillEditorConfig(
-                        placeholder: "Inserisci una sintesi...",
-                        scrollable: true,
-                        expands: false,
-                        padding: EdgeInsets.zero,
-                        autoFocus: false,
+            if (isLoadingSummary)
+                Util.isLoading()
+            else
+                Container(
+                    constraints: const BoxConstraints(minHeight: 100),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+                        color: Colors.white,
+                    ),
+                    child: quill.QuillEditor.basic(
+                        controller: _abstractController,
+                        config: const quill.QuillEditorConfig(
+                            placeholder: "Inserisci una sintesi...",
+                            scrollable: true,
+                            expands: false,
+                            padding: EdgeInsets.zero,
+                            autoFocus: false,
+                        ),
                     ),
                 ),
-            ),
         ];
     }
 
@@ -431,7 +545,7 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
                 ),
                 child: quill.QuillSimpleToolbar(
                     controller: _bodyController,
-                    config: const quill.QuillSimpleToolbarConfig(
+                    config: quill.QuillSimpleToolbarConfig(
                         showFontFamily: false,
                         showFontSize: false,
                         showBoldButton: true,
@@ -452,28 +566,78 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
                         showSubscript: false,
                         showSuperscript: false,
                         multiRowsDisplay: false,
+                        customButtons: [
+                            quill.QuillToolbarCustomButtonOptions(
+                                icon: Icon(Icons.summarize, color: Colors.red[600]),
+                                onPressed: () {
+                                    setState(() {
+                                        isLoadingSummary=true;
+                                    });
+
+                                    summarizer();
+
+                                    setState(() {
+                                        isLoadingSummary=false;
+                                    });
+                                },
+                                tooltip: 'Generazione di un abstract con AI.',
+                            ),
+                            quill.QuillToolbarCustomButtonOptions(
+                                icon: Icon(Icons.spellcheck, color: Colors.red[600]),
+                                onPressed: () {
+                                    setState(() {
+                                        isLoadingBody = true;
+                                    });
+
+                                    corrector(_bodyController);
+
+                                    setState(() {
+                                        isLoadingBody = false;
+                                    });
+                                },
+                                tooltip: 'Correzione del testo con AI.',
+                            ),
+                            quill.QuillToolbarCustomButtonOptions(
+                                icon: Icon(Icons.generating_tokens, color: Colors.red[600]),
+                                onPressed: () {
+                                    setState(() {
+                                        isLoadingSelectedCategory=true;
+                                    });
+
+                                    classifier(_bodyController);
+
+                                    setState(() {
+                                        isLoadingSelectedCategory=false;
+                                    });
+                                },
+                                tooltip: 'Classificazione del testo con AI.',
+                            ),
+                        ],
                     ),
                 ),
             ),
-            Container(
-                constraints: const BoxConstraints(minHeight: 100),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
-                    color: Colors.white,
-                ),
-                child: quill.QuillEditor.basic(
-                    controller: _bodyController,
-                    config: const quill.QuillEditorConfig(
-                        placeholder: "Inserisci il contenuto...",
-                        scrollable: true,
-                        expands: false,
-                        padding: EdgeInsets.zero,
-                        autoFocus: false,
+            if (isLoadingSummary)
+                Util.isLoading()
+            else
+                Container(
+                    constraints: const BoxConstraints(minHeight: 100),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+                        color: Colors.white,
+                    ),
+                    child: quill.QuillEditor.basic(
+                        controller: _bodyController,
+                        config: const quill.QuillEditorConfig(
+                            placeholder: "Inserisci il contenuto...",
+                            scrollable: true,
+                            expands: false,
+                            padding: EdgeInsets.zero,
+                            autoFocus: false,
+                        ),
                     ),
                 ),
-            ),
         ];
     }
 
@@ -523,6 +687,18 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
 
     List<Widget> _buildCategory() 
     {
+        if (isLoadingSelectedCategory)
+            return [
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                        Text(
+                            'Classificazione dell\'articolo...',
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                    ],
+                ),
+            ];
         return [
             Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -637,6 +813,7 @@ class _ArticleUpdatePage extends State<ArticleUpdatePage>
                 ),
         ];
     }
+
 
     List<Widget> _buildSaveAndDelete() 
     {

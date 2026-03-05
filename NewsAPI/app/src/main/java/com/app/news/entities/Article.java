@@ -20,6 +20,7 @@ public class Article
     private Long artID;
 
     @NotNull @NotBlank @Getter
+    @Column(columnDefinition = "TEXT")
     private String title;
 
     @NotNull @Getter
@@ -30,10 +31,8 @@ public class Article
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @OneToOne(
-            cascade=CascadeType.ALL,
-            orphanRemoval=true)
-    @JoinColumn(name="imgID")
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name="imgID", referencedColumnName = "imgID")
     @Getter
     @EqualsAndHashCode.Exclude @ToString.Exclude
     private Image image;
