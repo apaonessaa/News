@@ -9,12 +9,13 @@ networks:
     driver: bridge
 
 services:
-  # === Server ===
+  # === CORE SERVER ===
   database:
     container_name: news-database
     image: mysql:latest
     volumes:
-      - data-server:/var/lib/mysql
+      #- data-server:/var/lib/mysql
+      - ./Persist/database/:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWD}
       - MYSQL_USER=${DB_SPRING_USER}
@@ -34,10 +35,11 @@ services:
       timeout: 5s
 
   server:
-    build: NewsAPI
+    build: Server
     container_name: news-server
     volumes:
-      - data-images:/home/spring/images
+      #- data-images:/home/spring/images
+      - ./Persist/server/:/home/spring/images
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://news.database:3306/news
       - SPRING_DATASOURCE_USERNAME=${DB_SPRING_USER}
@@ -61,7 +63,7 @@ services:
   classifier:
     container_name: news-classifier
     build: 
-      context: NewsAI/Classifier
+      context: AI/Classifier
       args:
         - HF_TOKEN=${CLASSIFIER_TOKEN}
         - HF_API=${CLASSIFIER_API}
@@ -75,7 +77,7 @@ services:
   corrector:
     container_name: news-corrector
     build: 
-      context: NewsAI/Corrector
+      context: AI/Corrector
       args:
         - HF_TOKEN=${CORRECTOR_TOKEN}
         - HF_API=${CORRECTOR_API}
@@ -90,7 +92,7 @@ services:
   summarizer:
     container_name: news-summarizer
     build: 
-      context: NewsAI/Summarizer
+      context: AI/Summarizer
       args:
         - HF_TOKEN=${SUMMARIZER_TOKEN}
         - HF_API=${SUMMARIZER_API}
@@ -102,24 +104,20 @@ services:
         aliases:
           - news.summarizer
 
-  # === Authentication ===
+  # === AUTHENTICATION ===
   keycloak:
     container_name: news-oidc
     image: quay.io/keycloak/keycloak:latest
     volumes:
-      - ./NewsAuth/export:/opt/keycloak/data/import/:ro
+      - ./Auth/export:/opt/keycloak/data/import/:ro
     environment:
-      # --- HTTP Configurations ---
       - KC_HTTP_ENABLED=true
       - KC_HTTP_HOST=0.0.0.0
       - KC_HTTP_PORT=8000
-      # --- Proxy Configurations ---
       - KC_HOSTNAME_STRICT=false
-      - KC_PROXY_HEADERS=xforwarded
       - KC_HOSTNAME_STRICT_HTTPS=false
-      # --- Realm ---
+      - KC_PROXY_HEADERS=xforwarded
       - KC_IMPORT=/opt/keycloak/data/import/
-      # --- Logging and Metrics ---
       - KC_LOG_LEVEL=info
       - KC_HEALTH_ENABLED=true
       - KC_METRICS_ENABLED=true
@@ -148,7 +146,7 @@ services:
     image: quay.io/oauth2-proxy/oauth2-proxy:latest
     environment:
       - OAUTH2_PROXY_CLIENT_ID=news-keycloak-client
-      - OAUTH2_PROXY_CLIENT_SECRET=s3OjtEDp4bNaGdorwWyFHHScbL3QcfpB
+      - OAUTH2_PROXY_CLIENT_SECRET=${CLIENT_SECRET}
       - OAUTH2_PROXY_COOKIE_SECRET=${COOKIE_SECRET}
       - OAUTH2_PROXY_EMAIL_DOMAINS=*
       - OAUTH2_PROXY_REVERSE_PROXY=true
@@ -175,12 +173,12 @@ services:
         aliases:
           - news.oauth2
 
-  # === Reverse proxy ===
+  # === API GATEWAY ===
   api-gateway:
     container_name: news-api-gateway
     image: nginx:latest
     volumes:
-      - ./NewsProxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - 8080:80
     expose:
@@ -196,11 +194,11 @@ services:
       corrector: { condition: service_started }
       summarizer: { condition: service_started }
 
-  # === Web app ===
+  # === WEB APP ===
   web-app:
     container_name: news-webapp
     build:
-      context: NewsWeb
+      context: Web
       args:
         - HOST=localhost:3000
         - SERVICE=localhost:8080

@@ -32,28 +32,6 @@
     ]
   },
   {
-    "name": "Sport",
-    "description": "Dagli sport più popolari alle discipline meno conosciute, il nostro giornale ti porta le notizie più fresche e gli approfondimenti sugli sport che ami.",
-    "sub": [
-      {
-        "name": "Calcio",
-        "description": "Tutte le ultime notizie sul calcio, con focus su campionati, squadre, giocatori e tornei nazionali e internazionali."
-      },
-      {
-        "name": "Tennis",
-        "description": "Notizie e risultati dal mondo del tennis, con aggiornamenti sui principali tornei e approfondimenti su grandi campioni e nuove promesse."
-      },
-      {
-        "name": "Basket",
-        "description": "Segui il basket nazionale e internazionale, con articoli su partite, squadre, giocatori e le principali competizioni."
-      },
-      {
-        "name": "Curling",
-        "description": "Scopri il curling, uno sport invernale in crescita, con notizie, risultati e curiosità sulle competizioni e i protagonisti."
-      }
-    ]
-  },
-  {
     "name": "Tech",
     "description": "Tutte le ultime innovazioni tecnologiche, con un occhio di riguardo per l'intelligenza artificiale, la sicurezza informatica e le tendenze del futuro digitale.",
     "sub": [
